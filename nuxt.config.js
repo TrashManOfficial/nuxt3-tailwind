@@ -17,7 +17,16 @@ export default defineNuxtConfig({
     }
   },
   modules: ["nuxt3-vuex-module", "@vueuse/nuxt"],
+  runtimeConfig: {
+    public: {
+      baseURL: '/xkbapp/fundapi/article/api',
+    },
+  },
   nitro: {
+    // routeRules: {
+    //   '/xkbapp': { proxy: 'https://app.xkb.com.cn' },
+    //   "/fundapis": { proxy: 'https://app.xkb.com.cn' },
+    // },
     devProxy: {
       "/xkbapp": {
         // 配置需要代理的路径 --> 这里的意思是代理http://localhost:80/api/后的所有路由

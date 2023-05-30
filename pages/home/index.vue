@@ -1,9 +1,12 @@
 <template>
-    <Head>
+  <Head>
     <title>{{ '新快网_新中产的移动资讯友伴' }}</title>
     <!-- <meta name="description" :content="ArticleDetail?.metaInfo?.shareDesc" />
       <meta name="keywords" :content="ArticleDetail?.metaInfo?.keyWords" /> -->
   </Head>
+  <div v-for="item in [testData[0]]">
+      <div>{{ item }}</div>
+    </div>
   <div class="w-full flex fixed top-0 bg-white h-20 items-center shadow-md z-50 justify-center"
     v-if="!tabIsVisible && isPc">
     <div class="w-[1500px] flex">
@@ -31,7 +34,8 @@
         </DropDownModal>
       </div>
       <div class="w-full h-full flex-1 flex items-center absolute ph:relative">
-        <div class="h-16 w-full ph:h-14 ph:px-2 flex justify-center ph:justify-between ph:items-center ph:bg-primary flex-col items-center ph:flex-row">
+        <div
+          class="h-16 w-full ph:h-14 ph:px-2 flex justify-center ph:justify-between ph:items-center ph:bg-primary flex-col items-center ph:flex-row">
           <img class="hidden ph:flex ph:h-8" src="~/assets/images/logo_m.png" alt="" @click="toHome">
           <SearchBar @onSearch="onSearch" class="w-1/2 ph:w-[250px]">
           </SearchBar>
@@ -53,7 +57,8 @@
           <div class="mr-4 flex items-center cursor-pointer" v-for="item in channelStore.state.recommendList"
             @click="toDetail(item)">
             <img src="~/assets/images/listicon.png" class="h-3 w-3" />
-            <div class="container"><span :class="`${item.title.length > 20 ? 'scroll-text': ''}`">{{ item.title }}</span></div>
+            <div class="container"><span :class="`${item.title.length > 20 ? 'scroll-text' : ''}`">{{ item.title }}</span>
+            </div>
           </div>
         </div>
         <div class="w-full" v-if="Articlelist.length">
@@ -101,9 +106,18 @@ const tabIsVisible = useElementVisibility(tabRef)
 
 const Articlelist = ref([])
 
+const testData = ref([])
+
+channelStore.dispatch('getCarousel', 350).then(() => {
+  carouselList.value = [...channelStore.state.carouselList]
+  // testData.value = [...channelStore.state.carouselList]
+})
+
+
+
 const { query } = useRoute()
 onMounted(() => {
-  getChannels()
+  // getChannels()
 })
 
 const toHome = () => {
@@ -114,21 +128,39 @@ const toHome = () => {
 }
 
 //请求栏目列表
-const getChannels = () => {
-  channelStore.dispatch('getChannel', query.id).then(() => {
-    getArticleList()
-    //请求侧边栏专题模块
-    const id = channelStore.state.channelListRaw.data.find(i => i.title == '专题').id
-    channelStore.dispatch('getArticleList', id)
-    //请求推荐新闻
-    channelStore.dispatch('getRecommendList')
-  })
+const getChannels = async () => {
+  // channelStore.dispatch('getChannel', query.id).then((data) => {
+  //   // testData.value = [...channelStore.state.temp]
+  //   channelStore.dispatch('getChannelAdd', query.id).then((data) => {
+  //     testData.value = [...channelStore.state.temp]
+  //   getArticleList()
+  //   //请求侧边栏专题模块
+  //   const id = channelStore.state.channelListRaw.data.find(i => i.title == '专题').id
+  //   channelStore.dispatch('getArticleList', id)
+  //   //请求推荐新闻
+  //   channelStore.dispatch('getRecommendList')
+  //   })
+  // })
+  await channelStore.dispatch('getChannel', query.id)
+  await channelStore.dispatch('getChannelAdd', query.id)
+  // await getArticleList()
+  //请求侧边栏专题模块
+  // const id = channelStore.state.channelListRaw.data.find(i => i.title == '专题').id
+  // channelStore.dispatch('getArticleList', id)
+  //请求推荐新闻
+  await channelStore.dispatch('getRecommendList')
 }
-const getArticleList = () => {
-  channelStore.dispatch('getArticleList')
+
+getChannels()
+
+
+const getArticleList = async() => {
+  await channelStore.dispatch('getArticleList')
   Articlelist.value = [...channelStore.state.articleList.data]
   startRenderList.value = true
 }
+
+getArticleList()
 
 watch(() => channelStore.state.articleList.data, (value) => {
   Articlelist.value = [...value];
@@ -184,7 +216,7 @@ const onSearch = (text) => {
   width: 100%;
   height: 100%;
   opacity: 1;
-  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(3, 47, 50, 0.9));
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(3, 47, 50, 0.9));
 
 }
 
@@ -203,6 +235,7 @@ const onSearch = (text) => {
   0% {
     transform: translateX(20px);
   }
+
   100% {
     transform: translateX(-100%);
   }

@@ -1,7 +1,7 @@
 import { createStore } from "vuex";
-import axios from '../plugins/axios'
+import axios from "../plugins/axios";
 import utils from "../utils";
-const axiosReqres = axios().provide.axios
+const axiosReqres = axios().provide.axios;
 
 const channelStore = createStore({
   state: {
@@ -31,13 +31,16 @@ const channelStore = createStore({
     },
     articleListOver: false,
     carouselList: [],
-    recommendList:[],
+    recommendList: [],
+    temp:[],
   },
   actions: {
-    async getRecommendList({state,commit}) {
-      const id = state.channelList.data.filter(i => i.title === '首页')[0].id
-      const {data} = await axiosReqres(`/channels/getChildId?channelId=${id}`)
-      const channelId = data.data.find(i => i.title === '热闻推荐').id
+    async getRecommendList({ state, commit }) {
+      const id = state.channelList.data.filter((i) => i.title === "首页")[0].id;
+      const { data } = await axiosReqres(
+        `/channels/getChildId?channelId=${id}`
+      );
+      const channelId = data.data.find((i) => i.title === "热闻推荐").id;
       const list = await axiosReqres("/articles", {
         params: {
           chnlId: channelId,
@@ -48,9 +51,9 @@ const channelStore = createStore({
         },
       });
       try {
-        commit("RECOMMEND",list.data.data)
+        commit("RECOMMEND", list.data.data);
       } catch (err) {
-        throw err
+        throw err;
       }
     },
     async getCommentList({ state, commit }, id) {
@@ -156,13 +159,13 @@ const channelStore = createStore({
       }
     },
     async getCarousel({ commit }, id) {
-      const data = await axiosReqres("/articles/getRotationArticles", {
+      const {data} = await useApiFetch("/articles/getRotationArticles", {
         params: {
           chnlId: id,
         },
       });
       try {
-        commit("CAROUSEL", data);
+        commit("CAROUSEL", data._rawValue.data);
       } catch (err) {
         throw err;
       }
@@ -175,19 +178,36 @@ const channelStore = createStore({
       }
     },
     async getChannel({ state, commit }, id = undefined) {
-      const allChannel = await axiosReqres("/channels/getChildId", {
+      // const data = await useApiFetch("/channels/getChildId", {
+      //     params: {
+      //       channelId: 348,
+      //       size: 100,
+      //     },
+      // });
+
+      
+      const  {data:allChannel} = await useApiFetch("/channels/getChildId", {
         params: {
           channelId: 348,
           size: 100,
         },
       });
-      const addChannel = await axiosReqres("/channels/getChildId", {
+      state.temp = [...allChannel._rawValue.data]
+      // const finalData = [...allChannel._rawValue.data, ...addChannel._rawValue.data];
+      // try {
+      //   commit("CHANNEL", { channel: finalData, id });
+      // } catch (err) {
+      //   throw err;
+      // }
+    },
+    async getChannelAdd({ state, commit },id) {
+      const {data:addChannel} = await useApiFetch("/channels/getChildId", {
         params: {
           channelId: 382,
           size: 100,
         },
       });
-      const finalData = [...allChannel.data.data, ...addChannel.data.data];
+      const finalData = [...state.temp, ...addChannel._rawValue.data]
       try {
         commit("CHANNEL", { channel: finalData, id });
       } catch (err) {
@@ -204,7 +224,7 @@ const channelStore = createStore({
       }
     },
     async getArticleList({ state, commit }, id) {
-      const articles = await axiosReqres("/articles", {
+      const articles = await useApiFetch("/articles", {
         params: {
           chnlId: id || state.currentChannelId,
           //区分不同web和客户端参数，固定
@@ -215,7 +235,7 @@ const channelStore = createStore({
         },
       });
       try {
-        id ? commit("FEATURES", articles) : commit("ARTICLES", articles);
+        id ? commit("FEATURES", articles.data._rawValue.data) : commit("ARTICLES", articles.data._rawValue.data);
         // commit("ARTICLES", articles);
       } catch (err) {
         throw err;
@@ -230,8 +250,8 @@ const channelStore = createStore({
     },
   },
   mutations: {
-    RECOMMEND: (state,data) => {
-      state.recommendList = data
+    RECOMMEND: (state, data) => {
+      state.recommendList = data;
     },
     COMMENT: (state, data) => {
       state.commentList = data.data.data;
@@ -269,7 +289,7 @@ const channelStore = createStore({
       state.articleDetail = data.data.data;
     },
     CAROUSEL: (state, carousel) => {
-      state.carouselList = carousel.data.data;
+      state.carouselList = carousel;
     },
     CHANNEL: (state, { channel, id }) => {
       state.channelListRaw.data = [...channel];
@@ -281,14 +301,18 @@ const channelStore = createStore({
         ? state.channelList.data
         : filterData;
       if (id) {
-        const index = state.channelList.data.findIndex(i => i.id === id);
-        state.channelList.data = utils.splitAndMergeArray(state.channelList.data,7,index)
+        const index = state.channelList.data.findIndex((i) => i.id === id);
+        state.channelList.data = utils.splitAndMergeArray(
+          state.channelList.data,
+          7,
+          index
+        );
         // if (index !== -1 && index !== 2) {
         //   // 如果找到了指定id的项，并且它不是第三项，则和第三项交换位置
         //   [state.channelList.data[2], state.channelList.data[index]] = [state.channelList.data[index], state.channelList.data[2]];
         // }
         state.currentChannelId = id;
-        return
+        return;
       }
       if (state.channelList.data.length) {
         state.currentChannelId =
@@ -300,10 +324,10 @@ const channelStore = createStore({
     },
     ARTICLES: (state, articles) => {
       state.articleList.loading = false;
-      state.articleListOver = articles.data.data.length < 10 ? true : false;
+      state.articleListOver = articles.length < 10 ? true : false;
       state.articleList.data = [
         ...state.articleList.data,
-        ...articles.data.data,
+        ...articles,
       ];
     },
     CLEAR_ARTICLES: (state) => {
@@ -314,7 +338,7 @@ const channelStore = createStore({
       state.page.current += 1;
     },
     FEATURES: (state, articles) => {
-      state.featuresList = articles.data.data;
+      state.featuresList = articles;
     },
     EXCHANGE_ITEM: (state, params) => {
       const { index, data } = params;
