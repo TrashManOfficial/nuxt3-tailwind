@@ -7,7 +7,7 @@
   <div
     :class="`w-full flex bg-white h-20 items-center shadow-md z-50 justify-center ${tabIsVisible ? '' : 'fixed top-0'}`">
     <div class="w-[1500px] flex items-center justify-between">
-      <img class="m-2 h-12" src="../assets/logo.png" alt="新快网logo" @click="toHome">
+      <img class="m-2 h-12" src="~/assets/images/logo.png" alt="新快网logo" @click="toHome">
       <CustomTabs class="justify-around" :isPc="isPc"></CustomTabs>
     </div>
     <div class="w-1/4 mx-2">
@@ -17,7 +17,9 @@
   </div>
   <div class="flex justify-center">
     <div class="w-[1100px] flex ph:w-full justify-center mt-3 ">
-      <!-- <ShareBar></ShareBar> -->
+      <ClientOnly>
+        <ShareBar></ShareBar>
+      </ClientOnly>
       <div class="max-w-[750px] pr-6 flex flex-col ph:w-full">
         <div>
           <div class="text-3xl font-black my-6" ref="tabRef">{{ ArticleDetail.title }}</div>
@@ -25,8 +27,7 @@
           </InfoBar>
         </div>
         <!-- 一般文章稿件 -->
-        <div ref="contentRef" v-if="type === 1" v-html="str"
-          class="text-justify contentSpe docContentBox">
+        <div ref="contentRef" v-if="type === 1" v-html="str" class="text-justify contentSpe docContentBox">
         </div>
         <!-- 图集稿件 -->
         <CarouselDetail v-if="type === 2" :list="imgList" class="w-full">
@@ -96,7 +97,7 @@ import SearchBar from '../../components/SearchBar.vue';
 import SideBar from '../../components/SideBar.vue';
 import InfoBar from '../../components/ListItem/InfoBar.vue';
 import Footer from '../../components/Footer.vue';
-// import ShareBar from '../../components/ShareBar.vue';
+import ShareBar from '../../components/ShareBar.vue';
 import ScrollToTop from '../../components/ScrollToTop.vue';
 import CarouselDetail from '../../components/ListItem/CarouselDetail.vue';
 import { ref, onUnmounted, onBeforeMount, watch, onUpdated } from 'vue'
@@ -105,7 +106,8 @@ import { breakpointsTailwind, useBreakpoints, useElementVisibility } from '@vueu
 import channelStore from '../../store/channel';
 import { useRoute, useRouter } from 'vue-router'
 import utils from '../../utils'
-import axios from "axios"
+import { parse } from 'node-html-parser';
+
 const tabRef = ref()
 const tabIsVisible = useElementVisibility(tabRef)
 const { query } = useRoute()
@@ -147,8 +149,8 @@ const redirectToMobile = () => {
 
 const handleVideoInHtml = (html) => {
   // 假设HTML字符串存储在变量html中
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
+  // const parser = new DOMParser();
+  const doc = parse(html);
   const imgTags = doc.querySelectorAll('img[data-videourl]');
   if (!imgTags.length) {
     return html
@@ -185,22 +187,9 @@ const toDetail = (data) => {
   }
   utils.jump(temp, router, isPc)
 }
-const getChannels = () => {
-  channelStore.dispatch('getChannel')
-}
-getChannels()
+await channelStore.dispatch('getChannel')
+await channelStore.dispatch('getChannelAdd')
 
-
-const getArticleDetail = () => {
-  channelStore.dispatch('getArticleDetails', query.id).then(() => {
-    handleArticle(channelStore.state.articleDetail)
-    readCount()
-  })
-  // channelStore.dispatch('getCommentList', query.id).then(() => {
-  //   commentList.value = channelStore.state.commentList
-  // })
-}
-getArticleDetail()
 
 const getCommentList = () => {
   channelStore.dispatch('getCommentList', query.id).then(() => {
@@ -221,7 +210,8 @@ const handleArticle = async (data) => {
     ArticleDetail.value = channelStore.state.articleDetail
     const url = data.contentUrl
     const htmlData = await $fetch(`${url}`)
-    str.value = htmlData.htmlContent
+    // str.value = htmlData.htmlContent
+    str.value = handleVideoInHtml(htmlData.htmlContent)
 
 
     // let temp = handleVideoInHtml(htmlData.htmlContent)
@@ -267,6 +257,16 @@ const readCount = () => {
   const id = query.id
   // channelStore.dispatch('postReadCount',id)
 }
+
+const getArticleDetail = async () => {
+  await channelStore.dispatch('getArticleDetails', query.id)
+  await handleArticle(channelStore.state.articleDetail)
+  readCount()
+  // channelStore.dispatch('getCommentList', query.id).then(() => {
+  //   commentList.value = channelStore.state.commentList
+  // })
+}
+await getArticleDetail()
 
 const toHome = () => {
   const href = router.resolve({

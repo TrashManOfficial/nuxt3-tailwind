@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted,nextTick  } from 'vue';
 import DropDownList from './DropDownList.vue';
 import StrongTitle from './StrongTitle.vue';
 import channelStore from '../store/channel';
@@ -21,6 +21,8 @@ const tabList = ref([])
 const showModal = ref(false)
 
 const el = ref(null)
+
+const divs = ref({})
 
 
 onMounted(() => {
@@ -58,7 +60,11 @@ const currentId = ref('')
 watch(() => state.currentChannelId, (value) => {
   currentId.value = value
   if (!props.isPc) {
-    document.getElementById(currentId.value).scrollIntoView({ inline: "start" })
+    console.log(currentId.value);
+    nextTick(() => {
+      divs.value?.[currentId.value]?.scrollIntoView({ inline: "start" })
+    })
+    // process.browser && document.getElementById(currentId.value).scrollIntoView({ inline: "start" })
   }
 })
 
@@ -67,7 +73,7 @@ const setCurrentId = (id) => {
   channelStore.dispatch('setCurrentId', id).then(() => {
     window.scrollTo(0, 0)
     if (!props.isPc) {
-      document.getElementById(currentId.value).scrollIntoView({ inline: "start" })
+      divs.value?.[currentId.value]?.scrollIntoView({ inline: "start" })
     }
     channelStore.dispatch('getArticleList')
   })
@@ -113,7 +119,7 @@ const switchShowModal = (close) => {
 </script>
 <template>
   <div class="w-full flex ph:overflow-x-auto justify-between scrollBar ph:pr-8" ref="el">
-    <div :id="item.id" class="flex justify-start" v-for="item in showList">
+    <div :id="item.id" class="flex justify-start" v-for="item in showList" :ref="el => {divs[item.id] = el}">
       <StrongTitle :name="item.name" :isCurrent="currentId === item.id" v-if="item.id !== DEFAULT_KEY"
         @click="setCurrentId(item.id)">
       </StrongTitle>

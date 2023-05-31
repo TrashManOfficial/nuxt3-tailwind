@@ -84,7 +84,7 @@ const channelStore = createStore({
       });
       try {
         commit("CLEAR_ARTICLES");
-        commit("ARTICLES", articles);
+        commit("ARTICLES", articles.data.data);
       } catch (err) {
         throw err;
       }
@@ -123,6 +123,13 @@ const channelStore = createStore({
         throw err;
       }
     },
+    async clearArticleList({ commit }) {
+      try {
+        commit("CLEAR_ARTICLES");
+      } catch (err) {
+        throw err;
+      }
+    },
     async getSpecialList({ state, commit }, param) {
       // const data = await axiosReqres(`/articles/getSpecialGroupArticle`, {
       //   params: {
@@ -151,7 +158,9 @@ const channelStore = createStore({
       }
     },
     async getArticleDetails({ commit }, id) {
+      debugger
       const data = await axiosReqres(`/getArticle/${id}`, {});
+      debugger
       try {
         commit("ARTICLE_DETAILS", data);
       } catch (err) {
@@ -178,27 +187,14 @@ const channelStore = createStore({
       }
     },
     async getChannel({ state, commit }, id = undefined) {
-      // const data = await useApiFetch("/channels/getChildId", {
-      //     params: {
-      //       channelId: 348,
-      //       size: 100,
-      //     },
-      // });
-
-      
       const  {data:allChannel} = await useApiFetch("/channels/getChildId", {
         params: {
           channelId: 348,
           size: 100,
         },
       });
+      debugger
       state.temp = [...allChannel._rawValue.data]
-      // const finalData = [...allChannel._rawValue.data, ...addChannel._rawValue.data];
-      // try {
-      //   commit("CHANNEL", { channel: finalData, id });
-      // } catch (err) {
-      //   throw err;
-      // }
     },
     async getChannelAdd({ state, commit },id) {
       const {data:addChannel} = await useApiFetch("/channels/getChildId", {
@@ -207,6 +203,7 @@ const channelStore = createStore({
           size: 100,
         },
       });
+      debugger
       const finalData = [...state.temp, ...addChannel._rawValue.data]
       try {
         commit("CHANNEL", { channel: finalData, id });
@@ -307,10 +304,6 @@ const channelStore = createStore({
           7,
           index
         );
-        // if (index !== -1 && index !== 2) {
-        //   // 如果找到了指定id的项，并且它不是第三项，则和第三项交换位置
-        //   [state.channelList.data[2], state.channelList.data[index]] = [state.channelList.data[index], state.channelList.data[2]];
-        // }
         state.currentChannelId = id;
         return;
       }

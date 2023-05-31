@@ -5,8 +5,8 @@
       <meta name="keywords" :content="ArticleDetail?.metaInfo?.keyWords" /> -->
   </Head>
   <div v-for="item in [testData[0]]">
-      <div>{{ item }}</div>
-    </div>
+    <div>{{ item }}</div>
+  </div>
   <div class="w-full flex fixed top-0 bg-white h-20 items-center shadow-md z-50 justify-center"
     v-if="!tabIsVisible && isPc">
     <div class="w-[1500px] flex">
@@ -27,11 +27,13 @@
       <div class="mask">
       </div>
       <div class="text-lg text-white flex justify-end py-2 pr-6 w-full cursor-pointer ph:hidden absolute ph:relative">
-        <DropDownModal>
-          <div class="text-lg text-white flex justify-end py-2 pr-6 w-full cursor-pointer">
-            全媒体矩阵
-          </div>
-        </DropDownModal>
+        <ClientOnly>
+          <DropDownModal>
+            <div class="text-lg text-white flex justify-end py-2 pr-6 w-full cursor-pointer">
+              全媒体矩阵
+            </div>
+          </DropDownModal>
+        </ClientOnly>
       </div>
       <div class="w-full h-full flex-1 flex items-center absolute ph:relative">
         <div
@@ -62,7 +64,7 @@
           </div>
         </div>
         <div class="w-full" v-if="Articlelist.length">
-          <Carousel v-if="carouselList.length" :list="carouselList" class="mb-3"></Carousel>
+          <Carousel v-if="carouselList?.length" :list="carouselList" class="mb-3"></Carousel>
           <ListItem v-for="item in Articlelist" :data="item" :key="item" @click="toDetail(item)">
           </ListItem>
         </div>
@@ -81,7 +83,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted,getCurrentInstance,nextTick  } from 'vue';
 // import VirtualList from 'vue-virtual-scroll-list'
 import ListItem from '../../components/ListItem/ListItem.vue';
 import Footer from '../../components/Footer.vue';
@@ -108,17 +110,7 @@ const Articlelist = ref([])
 
 const testData = ref([])
 
-channelStore.dispatch('getCarousel', 350).then(() => {
-  carouselList.value = [...channelStore.state.carouselList]
-  // testData.value = [...channelStore.state.carouselList]
-})
-
-
-
 const { query } = useRoute()
-onMounted(() => {
-  // getChannels()
-})
 
 const toHome = () => {
   const href = router.resolve({
@@ -127,40 +119,38 @@ const toHome = () => {
   window.open(href.href, '_blank')
 }
 
-//请求栏目列表
-const getChannels = async () => {
-  // channelStore.dispatch('getChannel', query.id).then((data) => {
-  //   // testData.value = [...channelStore.state.temp]
-  //   channelStore.dispatch('getChannelAdd', query.id).then((data) => {
-  //     testData.value = [...channelStore.state.temp]
-  //   getArticleList()
-  //   //请求侧边栏专题模块
-  //   const id = channelStore.state.channelListRaw.data.find(i => i.title == '专题').id
-  //   channelStore.dispatch('getArticleList', id)
-  //   //请求推荐新闻
-  //   channelStore.dispatch('getRecommendList')
-  //   })
-  // })
-  await channelStore.dispatch('getChannel', query.id)
-  await channelStore.dispatch('getChannelAdd', query.id)
-  // await getArticleList()
-  //请求侧边栏专题模块
-  // const id = channelStore.state.channelListRaw.data.find(i => i.title == '专题').id
-  // channelStore.dispatch('getArticleList', id)
-  //请求推荐新闻
-  await channelStore.dispatch('getRecommendList')
-}
 
-getChannels()
-
-
-const getArticleList = async() => {
+await channelStore.dispatch('clearArticleList')
+const getArticleList = async () => {
   await channelStore.dispatch('getArticleList')
   Articlelist.value = [...channelStore.state.articleList.data]
   startRenderList.value = true
 }
 
-getArticleList()
+//请求栏目列表
+
+// warning !!!!! 不要在同一个函数里面使用多个await !!!!! 会丢失nuxt instance的作用域
+// 参考 https://github.com/nuxt/nuxt/issues/14718
+// const getChannels = async () => {
+//   await channelStore.dispatch('getChannel', query.id)
+//   await channelStore.dispatch('getChannelAdd', query.id)
+//   // await getArticleList()
+//   //请求推荐新闻
+//   await channelStore.dispatch('getRecommendList')
+// }
+// await getChannels()
+
+// 正确操作√
+await channelStore.dispatch('getChannel', query.id)
+await channelStore.dispatch('getChannelAdd', query.id)
+await getArticleList()
+
+// const requetMain = async () => {
+//   await getChannels()
+//   await getArticleList()
+// }
+
+// requetMain()
 
 watch(() => channelStore.state.articleList.data, (value) => {
   Articlelist.value = [...value];
@@ -168,22 +158,24 @@ watch(() => channelStore.state.articleList.data, (value) => {
 
 //监听当前栏目是否为首页，请求轮播图
 const carouselList = ref([])
-watch(() => channelStore.state.currentChannelId, (value) => {
+watch(() => channelStore.state.currentChannelId, async (value) => {
   if (value && channelStore.state.channelList.data.length) {
-    getCarousel(value)
+    await getCarousel(value)
   }
 })
 
-const getCarousel = (value) => {
+await channelStore.dispatch('getCarousel', 350)
+carouselList.value = [...channelStore.state.carouselList]
+
+const getCarousel = async (value) => {
   const { title } = channelStore.state.channelList.data.find(i => i.id == value)
   if (title === '首页') {
-    channelStore.dispatch('getCarousel', value).then(() => {
+    await channelStore.dispatch('getCarousel', value)
+    nextTick(() => {
       carouselList.value = [...channelStore.state.carouselList]
-      return
     })
   }
   carouselList.value = []
-
 }
 
 //页面滚动底部请求更多数据

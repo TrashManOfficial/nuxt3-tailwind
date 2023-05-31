@@ -3,7 +3,7 @@
     :class="`w-full flex bg-white h-20 items-center shadow-md z-50 justify-center ${tabIsVisible ? '' : 'fixed top-0'}`"
     v-if="isPc">
     <div class="w-[1500px] flex items-center justify-between">
-      <img class="m-2 h-12" src="../assets/logo.png" @click="toHome">
+      <img class="m-2 h-12" src="~/assets/images/logo.png" @click="toHome">
       <CustomTabs class="justify-around" :isPc="isPc"></CustomTabs>
     </div>
   </div>
@@ -75,13 +75,6 @@ const redirectToMobile = () => {
   }
 }
 
-const getChannels = () => {
-  channelStore.dispatch('getChannel').then(() => {
-    getSpecialDetail()
-    const id = channelStore.state.channelListRaw.data.find(i => i.title == '专题').id
-    channelStore.dispatch('getArticleList', id)
-  })
-}
 const getSpecialDetail = () => {
   channelStore.dispatch('getArticleDetails', query.docid).then(() => {
     ArticleDetail.value = channelStore.state.articleDetail
@@ -90,6 +83,12 @@ const getSpecialDetail = () => {
       startRenderList.value = true
     })
   })
+}
+
+const getChannels = async() => {
+  await channelStore.dispatch('getChannel')
+  await channelStore.dispatch('getChannelAdd')
+  getSpecialDetail()
 }
 const getArticleList = () => {
   channelStore.dispatch('getSpecialList')

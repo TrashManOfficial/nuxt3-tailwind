@@ -30,6 +30,9 @@ const imglist = [
     alt: '公众号'
   }
 ]
+const generateImgPath = (fileName) => {
+  return new URL(`../assets/images/${fileName}.png`, import.meta.url).href
+}
 </script>
 <template>
   <div class="flex justify-center">
@@ -44,7 +47,7 @@ const imglist = [
                 </svg> -->
         <div v-if="isButtonHover" class="absolute top-9 right-0 p-2 z-40 flex bg-white w-[420px] justify-between rounded-lg">
           <div v-for="item in imglist" class="flex flex-col items-center">
-            <img class="w-20 h-20" :src="utils.getAssetsFile(item.name)" :alt="item.alt">
+            <img class="w-20 h-20" :src="generateImgPath(item.name)" :alt="item.alt">
             <div class="text-black text-sm">{{ item.alt }}</div>
           </div>
           <div class="flex flex-col items-center">

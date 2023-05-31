@@ -1,6 +1,6 @@
 const getAssetsFile = (url) => {
-  // console.log('111',new URL(`./assets/site/${url}.png`, import.meta.url).href, url);
-  return new URL(`./assets/${url}.png`, import.meta.url).href;
+  console.log('111',new URL(`./assets/images/${url}.png`, import.meta.url).href, url);
+  return new URL(`~/assets/images/${url}.png`, import.meta.url).href;
 };
 
 const replaceImgPath = (str) => {
