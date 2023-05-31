@@ -158,9 +158,7 @@ const channelStore = createStore({
       }
     },
     async getArticleDetails({ commit }, id) {
-      debugger
       const data = await axiosReqres(`/getArticle/${id}`, {});
-      debugger
       try {
         commit("ARTICLE_DETAILS", data);
       } catch (err) {
@@ -193,7 +191,6 @@ const channelStore = createStore({
           size: 100,
         },
       });
-      debugger
       state.temp = [...allChannel._rawValue.data]
     },
     async getChannelAdd({ state, commit },id) {
@@ -203,7 +200,6 @@ const channelStore = createStore({
           size: 100,
         },
       });
-      debugger
       const finalData = [...state.temp, ...addChannel._rawValue.data]
       try {
         commit("CHANNEL", { channel: finalData, id });
