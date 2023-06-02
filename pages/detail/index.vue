@@ -116,7 +116,11 @@ const isPc = ref(breakpoints.greater('md'))
 const ArticleDetail = ref({})
 const str = ref('')
 
-// const test = ref('')
+useHead({
+  meta: [
+    { name: 'referrer', content: 'no-referrer' }
+  ],
+})
 
 const imgList = ref([])
 const videoDetail = ref({})
@@ -157,23 +161,27 @@ const handleVideoInHtml = (html) => {
   }
 
   imgTags.forEach(img => {
-    const video = doc.createElement('video');
+    const video = parse('<video></video>');
+    // console.log(video.toString());
     const videoSrc = img.getAttribute('data-videourl');
 
     // 将video标签属性设置为与img标签相同
-    video.setAttribute('src', videoSrc);
-    video.setAttribute('alt', img.getAttribute('alt'));
-    video.setAttribute('class', img.getAttribute('class'));
-    video.setAttribute('style', img.getAttribute('style'));
-    video.setAttribute('class', 'm-auto');
-    video.setAttribute('controls', true);
+    video.firstChild.setAttribute('src', videoSrc);
+    video.firstChild.setAttribute('alt', img.getAttribute('alt'));
+    video.firstChild.setAttribute('class', img.getAttribute('class'));
+    video.firstChild.setAttribute('style', img.getAttribute('style'));
+    video.firstChild.setAttribute('class', 'm-auto');
+    video.firstChild.setAttribute('controls', true);
+    // console.log(video.toString());
 
     // 将img标签替换为video标签
     img.replaceWith(video);
   });
 
   // 将修改后的DOM对象转换回HTML字符串
-  const newHtml = doc.documentElement.outerHTML;
+  const newHtml = doc.toString();
+  // console.log(imgTags,newHtml);
+
   return newHtml;
 }
 
@@ -197,7 +205,6 @@ const getCommentList = () => {
   })
 }
 
-// requestHtmlContent('https://app.xkb.com.cn/fundapis/static/res/4/f/4/doc222055.json')
 
 const handleArticle = async (data) => {
   ArticleDetail.value = data
@@ -251,11 +258,11 @@ const handleArticle = async (data) => {
 
 }
 
-// handleArticle(channelStore.state.articleDetail)
+
 
 const readCount = () => {
   const id = query.id
-  // channelStore.dispatch('postReadCount',id)
+  channelStore.dispatch('postReadCount',id)
 }
 
 const getArticleDetail = async () => {

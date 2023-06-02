@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "trsFontFace";
+    src: url("/trs_assets/FZLTXIHJW.woff2") format('woff2'),url("/trs_assets/FZLTXIHJW.woff") format('woff'),url("/trs_assets/FZLTXIHJW.ttf") format('truetype');
+  }
+}

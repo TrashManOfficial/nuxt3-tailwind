@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted,nextTick  } from 'vue';
+import { ref, computed, watch, onMounted, nextTick } from 'vue';
 import DropDownList from './DropDownList.vue';
 import StrongTitle from './StrongTitle.vue';
 import channelStore from '../store/channel';
@@ -33,6 +33,12 @@ onMounted(() => {
     }
   })]
   currentId.value = state.currentChannelId
+  // 移动端浏览器自动滚动到对应栏目位置
+  if (!props.isPc) {
+    nextTick(() => {
+      divs.value[currentId.value].scrollIntoView({ inline: "start" })
+    })
+  }
 })
 
 watch(() => state.channelList.data, () => {
@@ -60,10 +66,10 @@ const currentId = ref('')
 watch(() => state.currentChannelId, (value) => {
   currentId.value = value
   if (!props.isPc) {
-    console.log(currentId.value);
-    nextTick(() => {
-      divs.value?.[currentId.value]?.scrollIntoView({ inline: "start" })
-    })
+    divs.value[currentId.value].scrollIntoView({ inline: "start" })
+    // nextTick(() => {
+    //   divs.value[currentId.value].scrollIntoView({ inline: "start" })
+    // })
     // process.browser && document.getElementById(currentId.value).scrollIntoView({ inline: "start" })
   }
 })
@@ -119,7 +125,7 @@ const switchShowModal = (close) => {
 </script>
 <template>
   <div class="w-full flex ph:overflow-x-auto justify-between scrollBar ph:pr-8" ref="el">
-    <div :id="item.id" class="flex justify-start" v-for="item in showList" :ref="el => {divs[item.id] = el}">
+    <div :id="item.id" class="flex justify-start" v-for="item in showList" :ref="el => { divs[item.id] = el }">
       <StrongTitle :name="item.name" :isCurrent="currentId === item.id" v-if="item.id !== DEFAULT_KEY"
         @click="setCurrentId(item.id)">
       </StrongTitle>

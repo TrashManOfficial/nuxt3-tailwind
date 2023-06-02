@@ -29,6 +29,10 @@ const requestData = async () => {
   featuresList.value = data._rawValue.data
 }
 requestData()
+
+const linkRender = (data) => {
+  return utils.renderLink(data, router, isPc)
+}
 // onMounted(requestData)
 
 // watch(() => channelStore.state.featuresList, (value) => {
@@ -45,9 +49,9 @@ requestData()
   <div class="flex flex-col sticky top-[80px] bg-white">
     <StrongTitle :name="'专题'" :isCurrent="true" class="mb-3 mt-4"></StrongTitle>
     <div class="bg-teal-50 rounded-xl p-3">
-      <div class="mr-4 flex items-center mb-2 cursor-pointer" v-for="item in featuresList" @click="toDetail(item)">
+      <div class="mr-4 flex items-center mb-2 cursor-pointer" v-for="item in featuresList">
         <img src="~/assets/images/listicon.png" class="h-3 w-3" />
-        <a>{{ item.title }}</a>
+        <a :href="linkRender(item)" @click="toDetail(item)" target="_blank">{{ item.title }}</a>
       </div>
   </div>
   <div class="full flex items-start ph:px-1 ph:py-3 flex-col text-sm mt-2 text-gray-400">

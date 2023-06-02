@@ -35,15 +35,20 @@ const channelStore = createStore({
     temp:[],
   },
   actions: {
+    async postReadCount({state},id) {
+      const data = await axiosReqres.post(`/fundapis/prise/api/read/${id}`,{},{baseURL: ''})
+    },
     async getRecommendList({ state, commit }) {
-      const id = state.channelList.data.filter((i) => i.title === "首页")[0].id;
-      const { data } = await axiosReqres(
-        `/channels/getChildId?channelId=${id}`
-      );
-      const channelId = data.data.find((i) => i.title === "热闻推荐").id;
-      const list = await axiosReqres("/articles", {
+      // const id = state.channelList.data.filter((i) => i.title === "首页")[0].id;
+      // const { data } = await useApiFetch(
+      //   `/channels/getChildId?channelId=${id}`
+      // );
+      
+      // const channelId = data._rawValue.data.find((i) => i.title === "热闻推荐").id;
+      // console.log(channelId);
+      const list = await useApiFetch("/articles", {
         params: {
-          chnlId: channelId,
+          chnlId: 351,
           //区分不同web和客户端参数，固定
           visibility: 1,
           page: 0,
@@ -51,7 +56,7 @@ const channelStore = createStore({
         },
       });
       try {
-        commit("RECOMMEND", list.data.data);
+        commit("RECOMMEND", list.data._rawValue.data);
       } catch (err) {
         throw err;
       }
@@ -158,7 +163,8 @@ const channelStore = createStore({
       }
     },
     async getArticleDetails({ commit }, id) {
-      const data = await axiosReqres(`/getArticle/${id}`, {});
+      const url = process.dev ? `/getArticle/${id}` : `https://www.xkb.com.cn/xkbapp/fundapi/article/api/getArticle/${id}`
+      const data = await axiosReqres(url, {});
       try {
         commit("ARTICLE_DETAILS", data);
       } catch (err) {

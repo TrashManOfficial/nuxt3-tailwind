@@ -59,11 +59,9 @@ const jump = (data, router, flag) => {
   let path = "";
   if (metaInfo.docType === 8) {
     window.open(metaInfo.linkDoc, "_blank");
-    return;
   }
   if (metaInfo.docType === 4) {
     window.open(metaInfo.linkDoc, "_blank");
-    return;
   }
   if (metaInfo.docType === 3) {
     path = "special";
@@ -79,6 +77,7 @@ const jump = (data, router, flag) => {
     });
     if (flag.value) {
       window.open(herf.href, "_blank");
+      // return herf.href
     } else {
       window.location.href = `https://www.xkb.com.cn/fundhtml/#/specialdoc?id=${data.id}`;
     }
@@ -93,19 +92,64 @@ const jump = (data, router, flag) => {
     });
     if (flag.value) {
       window.open(herf.href, "_blank");
+      // console.log(herf.href);
+      // return herf.href
     } else {
       window.location.href = `https://www.xkb.com.cn/fundhtml/#/details?id=${data.id}`;
     }
   }
-  // const herf = router.resolve({
-  //   name: path,
-  //   query: params,
-  // });
-  // if (flag.value) {
-  //   window.open(herf.href, "_blank");
-  // } else {
-  //   window.location.href = `https://app.xkb.com.cn/fundhtml/#/details?id=${data.id}`;
-  // }
+};
+
+const renderLink = (data, router, flag) => {
+  const { metaInfo } = data;
+  let params = {};
+  let path = "";
+  if (metaInfo.docType === 8) {
+    // window.open(metaInfo.linkDoc, "_blank");
+    return metaInfo.linkDoc;
+  }
+  if (metaInfo.docType === 4) {
+    // window.open(metaInfo.linkDoc, "_blank");
+    return metaInfo.linkDoc;
+  }
+  if (metaInfo.docType === 3) {
+    path = "special";
+    // const groupid = data.metaInfo.specialDoc.groups[0].groupId;
+    const { docId } = data;
+    params = {
+      // groupid,
+      docid: docId,
+    };
+    const herf = router.resolve({
+      name: path,
+      query: params,
+    });
+    return herf.href
+    // if (flag.value) {
+    //   // window.open(herf.href, "_blank");
+    //   return herf.href
+    // } else {
+    //   return `https://www.xkb.com.cn/fundhtml/#/specialdoc?id=${data.id}`
+    //   // window.location.href = `https://www.xkb.com.cn/fundhtml/#/specialdoc?id=${data.id}`;
+    // }
+  } else {
+    path = "detail";
+    params = {
+      id: data.id || data.docId,
+    };
+    const herf = router.resolve({
+      name: path,
+      query: params,
+    });
+    return herf.href
+    // if (flag.value) {
+    //   // window.open(herf.href, "_blank");
+    //   return herf.href
+    // } else {
+    //   // window.location.href = `https://www.xkb.com.cn/fundhtml/#/details?id=${data.id}`;
+    //   return `https://www.xkb.com.cn/fundhtml/#/details?id=${data.id}`;
+    // }
+  }
 };
 
 function splitAndMergeArray(arr, len, index) {
@@ -134,4 +178,5 @@ export default {
   jump,
   replaceImgPath,
   splitAndMergeArray,
+  renderLink
 };

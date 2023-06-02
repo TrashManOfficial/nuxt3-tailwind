@@ -43,9 +43,9 @@
           </SearchBar>
           <div v-if="isPc" class="w-1/2">
             <div class="mr-4 flex items-center cursor-pointer" v-for="item in channelStore.state.recommendList"
-              @click="toDetail(item)">
+              >
               <img src="~/assets/images/listicon.png" class="h-3 w-3" />
-              <div class="text-white">{{ item.title }}</div>
+              <a class="text-white" :href="linkRender(item)" target="_blank" @click="toDetail(item)">{{ item.title }}</a>
             </div>
           </div>
         </div>
@@ -57,16 +57,24 @@
         </CustomTabs>
         <div v-if="channelStore.state.currentChannelId === '350' && !isPc">
           <div class="mr-4 flex items-center cursor-pointer" v-for="item in channelStore.state.recommendList"
-            @click="toDetail(item)">
+            >
             <img src="~/assets/images/listicon.png" class="h-3 w-3" />
-            <div class="container"><span :class="`${item.title.length > 20 ? 'scroll-text' : ''}`">{{ item.title }}</span>
-            </div>
+            <a class="container" :href="linkRender(item)" target="_blank" @click="toDetail(item)"><span :class="`${item.title.length > 20 ? 'scroll-text' : ''}`">{{ item.title }}</span>
+            </a>
           </div>
         </div>
         <div class="w-full" v-if="Articlelist.length">
           <Carousel v-if="carouselList?.length" :list="carouselList" class="mb-3"></Carousel>
-          <ListItem v-for="item in Articlelist" :data="item" :key="item" @click="toDetail(item)">
+          <a  v-for="item in Articlelist" :href="linkRender(item)" target="_blank" @click="toDetail(item)">
+            <ListItem :data="item" :key="item">
+            </ListItem>
+          </a>
+          <!-- <a v-for="item in Articlelist" :href="toDetail(item)" :key="item" target="_blank">
+            <ListItem  :data="item" :key="item">
           </ListItem>
+          </a> -->
+          <!-- <ListItem v-for="item in Articlelist" :data="item" :key="item" @click="toDetail(item)">
+          </ListItem> -->
         </div>
         <!-- <div v-else class="w-full h-[400px] flex justify-center items-center">
           暂无数据
@@ -83,7 +91,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watch, onMounted,getCurrentInstance,nextTick  } from 'vue';
+import { ref, watch, onMounted, getCurrentInstance, nextTick } from 'vue';
 // import VirtualList from 'vue-virtual-scroll-list'
 import ListItem from '../../components/ListItem/ListItem.vue';
 import Footer from '../../components/Footer.vue';
@@ -119,6 +127,10 @@ const toHome = () => {
   window.open(href.href, '_blank')
 }
 
+const linkRender = (data) => {
+  return utils.renderLink(data, router, isPc)
+}
+
 
 await channelStore.dispatch('clearArticleList')
 const getArticleList = async () => {
@@ -143,14 +155,8 @@ const getArticleList = async () => {
 // 正确操作√
 await channelStore.dispatch('getChannel', query.id)
 await channelStore.dispatch('getChannelAdd', query.id)
+await channelStore.dispatch('getRecommendList')
 await getArticleList()
-
-// const requetMain = async () => {
-//   await getChannels()
-//   await getArticleList()
-// }
-
-// requetMain()
 
 watch(() => channelStore.state.articleList.data, (value) => {
   Articlelist.value = [...value];
@@ -189,7 +195,7 @@ watch(targetIsVisible, (value) => {
 
 const router = useRouter()
 const toDetail = (data) => {
-  utils.jump(data, router, isPc)
+  return utils.jump(data, router, isPc)
 }
 
 const onSearch = (text) => {
