@@ -1,14 +1,15 @@
 <template>
   <Head>
-    <title>{{ ArticleDetail.title }}</title>
-    <meta name="description" :content="ArticleDetail?.metaInfo?.shareDesc" />
-    <meta name="keywords" :content="ArticleDetail?.metaInfo?.keyWords" />
+    <Title>{{ ArticleDetail.title }}</Title>
+    <Meta name="referrer" content="no-referrer"></Meta>
+    <Meta name="description" :content=" ArticleDetail.title + ArticleDetail?.metaInfo?.shareDesc" />
+    <Meta name="keywords" :content="ArticleDetail?.metaInfo?.keyWords + `新闻,要闻,广东,广州,新快报,股评,房产,大事件,报纸,评论,深读,专题,星座 新闻,要闻,广东,广州,新快报,股评,房产,大事件,报纸,评论,深读,专题,星座`" />
   </Head>
   <div
     :class="`w-full flex bg-white h-20 items-center shadow-md z-50 justify-center ${tabIsVisible ? '' : 'fixed top-0'}`">
     <div class="w-[1500px] flex items-center justify-between">
       <img class="m-2 h-12" src="~/assets/images/logo.png" alt="新快网logo" @click="toHome">
-      <CustomTabs class="justify-around" :isPc="isPc"></CustomTabs>
+      <CustomTabs class="justify-around" :isPc="isPc" :defautId="ArticleDetail.chnlId"></CustomTabs>
     </div>
     <div class="w-1/4 mx-2">
       <SearchBar @onSearch="onSearch">
@@ -116,11 +117,14 @@ const isPc = ref(breakpoints.greater('md'))
 const ArticleDetail = ref({})
 const str = ref('')
 
-useHead({
-  meta: [
-    { name: 'referrer', content: 'no-referrer' }
-  ],
-})
+// useHead({
+//   title: ArticleDetail.value.title,
+//   meta: [
+//     { name: 'referrer', content: 'no-referrer' },
+//     { name: 'description', content: ArticleDetail?.metaInfo?.shareDesc },
+//     { name: 'keywords', content: ArticleDetail?.metaInfo?.keyWords },
+//   ],
+// })
 
 const imgList = ref([])
 const videoDetail = ref({})
@@ -186,16 +190,18 @@ const handleVideoInHtml = (html) => {
 }
 
 const toDetail = (data) => {
+  // console.log(data);
   const temp = {
     docId: data.docId,
     id: data.docId,
     metaInfo: {
       listStyle: data.listStyle,
+      shareUrl:data.shareUrl,
     }
   }
   utils.jump(temp, router, isPc)
 }
-await channelStore.dispatch('getChannel')
+// await channelStore.dispatch('getChannel')
 await channelStore.dispatch('getChannelAdd')
 
 
@@ -244,7 +250,7 @@ const handleArticle = async (data) => {
   }
   //图集
   if (type.value === 2) {
-    imgList.value = data.metaInfo.appendixs
+    imgList.value = data.metaInfo.picDoc
     // return
   }
 
@@ -268,18 +274,20 @@ const readCount = () => {
 const getArticleDetail = async () => {
   await channelStore.dispatch('getArticleDetails', query.id)
   await handleArticle(channelStore.state.articleDetail)
-  readCount()
+  !process.dev && readCount()
   // channelStore.dispatch('getCommentList', query.id).then(() => {
   //   commentList.value = channelStore.state.commentList
   // })
 }
 await getArticleDetail()
+// await channelStore.dispatch('setCurrentDocId',ArticleDetail.value.chnlId)
 
 const toHome = () => {
   const href = router.resolve({
     path: '/home'
   })
-  window.open(href.href, '_blank')
+  // window.open(href.href, '_blank')
+  window.location.href = href.href
 }
 
 </script>

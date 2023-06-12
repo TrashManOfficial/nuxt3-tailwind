@@ -1,4 +1,7 @@
 <template>
+  <Head>
+    <Title>{{ '新快网_新中产的移动资讯友伴' }}</Title>
+  </Head>
   <div class="w-full flex fixed top-0 bg-white h-20 items-center shadow-md z-50 justify-center" v-if="isPc">
     <div class="w-[1500px] flex">
       <div class="w-full flex items-center justify-between">
@@ -38,9 +41,9 @@
           <ListItem v-for="item in Articlelist" :data="item" :key="item" @click="toDetail(item)">
           </ListItem>
         </div>
-        <!-- <div v-else class="w-full h-[400px] flex justify-center items-center">
-          暂无数据
-        </div> -->
+        <div v-else class="w-full h-[400px] flex justify-center items-center">
+          暂时没有找到'{{ keyword }}'的文章
+        </div>
       </div>
       <div class=" w-3/12 ph:hidden pl-2">
         <SideBar></SideBar>
@@ -81,19 +84,15 @@ const { keyword } = query
 
 onMounted(() => {
   channelStore.dispatch('searchArticleList', keyword).then(() => {
-    getChannels()
+    startRenderList.value = true
   })
-  // getChannels()
 })
 
-const getChannels = async() => {
-  await channelStore.dispatch('getChannel')
-  await channelStore.dispatch('getChannelAdd')
-}
+await channelStore.dispatch('getChannelAdd')
 const getArticleList = () => {
   channelStore.dispatch('getArticleList')
   Articlelist.value = [...channelStore.state.articleList.data]
-  startRenderList.value = true
+  // startRenderList.value = true
 }
 
 watch(() => channelStore.state.articleList.data, (value) => {
@@ -101,7 +100,6 @@ watch(() => channelStore.state.articleList.data, (value) => {
 })
 
 watch(targetIsVisible, (value) => {
-  // debugger
   if (startRenderList.value && value && !channelStore.state.articleListOver) {
     channelStore.dispatch('addPage').then(() => {
       channelStore.dispatch('searchArticleListAdd').then(() => {
@@ -117,16 +115,24 @@ const toDetail = (data) => {
 }
 
 const onSearch = (text) => {
-  channelStore.dispatch('searchArticleList', text).then(() => {
-    // channelStore.dispatch('getArticleList')
+  const href = router.resolve({
+    path:'/search',
+    query:{
+      keyword:text
+    }
   })
+  window.location.href = href.href
+  // channelStore.dispatch('searchArticleList', text).then(() => {
+  //   // channelStore.dispatch('getArticleList')
+  // })
 }
 
 const toHome = () => {
   const href = router.resolve({
-    path:'/home'
+    path: '/home'
   })
-  window.open(href.href,'_blank')
+  // window.open(href.href, '_blank')
+  window.location.href = href.href
 }
 
 </script>

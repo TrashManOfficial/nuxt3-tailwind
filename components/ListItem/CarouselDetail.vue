@@ -62,11 +62,11 @@ const switchImg = (flag) => {
           <span
             class="absolute top-1/2 left-1/2 text-2xl font-semibold text-white -translate-x-1/2 -translate-y-1/2 sm:text-3xl dark:text-gray-800">First
             Slide</span>
-          <img :src="item.appfile" @click="toDetail(item)"
+          <img :src="item.pic" @click="toDetail(item)"
             class="h-full block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 object-cover" alt="">
           <div
             class="flex p-1 absolute bottom-0 left-1/2 z-30 space-x-3 -translate-x-1/2 bg-black w-full min-h-11 opacityLinear text-2xl text-white justify-center items-center rounded-b-lg">
-            {{ item.appdesc }}</div>
+            {{ item.desc }}</div>
         </div>
       </div>
       <!-- Slider indicators -->

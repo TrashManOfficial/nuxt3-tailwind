@@ -15,6 +15,7 @@ const DEFAULT_LIST_LENGTH = 7
 
 const props = defineProps({
   isPc: Boolean,
+  defautId: Number,
 })
 const tabList = ref([])
 
@@ -24,22 +25,42 @@ const el = ref(null)
 
 const divs = ref({})
 
+const currentId = ref('')
 
-onMounted(() => {
-  tabList.value = [...state.channelList.data.map(i => {
-    return {
-      id: i.id,
-      name: i.title
-    }
-  })]
-  currentId.value = state.currentChannelId
-  // 移动端浏览器自动滚动到对应栏目位置
-  if (!props.isPc) {
-    nextTick(() => {
-      divs.value[currentId.value].scrollIntoView({ inline: "start" })
-    })
+// await channelStore.dispatch('getChannel', query.id)
+// await channelStore.dispatch('getChannelAdd', query.id)
+
+tabList.value = [...state.channelList.data.map(i => {
+  return {
+    id: i.id,
+    name: i.title
   }
-})
+})]
+currentId.value = props.defautId || state.currentChannelId
+props.defautId && channelStore.dispatch('setCurrentId', currentId.value)
+// 移动端浏览器自动滚动到对应栏目位置
+if (!props.isPc) {
+  nextTick(() => {
+    divs.value[currentId.value].scrollIntoView({ inline: "start" })
+  })
+}
+
+
+// onMounted(() => {
+//   tabList.value = [...state.channelList.data.map(i => {
+//     return {
+//       id: i.id,
+//       name: i.title
+//     }
+//   })]
+//   currentId.value = state.currentChannelId
+//   // 移动端浏览器自动滚动到对应栏目位置
+//   if (!props.isPc) {
+//     nextTick(() => {
+//       divs.value[currentId.value].scrollIntoView({ inline: "start" })
+//     })
+//   }
+// })
 
 watch(() => state.channelList.data, () => {
   tabList.value = [...state.channelList.data.map(i => {
@@ -61,16 +82,10 @@ watch(() => props.isPc, (value) => {
   tabList.value = [...tabList.value]
 })
 
-const currentId = ref('')
-
 watch(() => state.currentChannelId, (value) => {
   currentId.value = value
   if (!props.isPc) {
     divs.value[currentId.value].scrollIntoView({ inline: "start" })
-    // nextTick(() => {
-    //   divs.value[currentId.value].scrollIntoView({ inline: "start" })
-    // })
-    // process.browser && document.getElementById(currentId.value).scrollIntoView({ inline: "start" })
   }
 })
 
@@ -97,11 +112,15 @@ const hiddenList = computed(() => {
   return tabList.value.slice(DEFAULT_LENGTH.value)
 })
 
+const defineData = hiddenList.value.find(item => item.id === props.defautId)
+if (defineData) {
+  channelStore.dispatch('exchangeItem', { index: DEFAULT_LENGTH.value, data:defineData })
+}
+
 const hiddenListClick = (data) => {
   //交换下拉列表的数据和显示tab的末尾数据
   channelStore.dispatch('exchangeItem', { index: DEFAULT_LENGTH.value, data })
   setCurrentId(data.id)
-  // debugger
 }
 
 const mobileItemClick = (data) => {
@@ -122,17 +141,27 @@ const switchShowModal = (close) => {
     showModal.value = !showModal.value
   }
 }
+const renderLink = (id) => {
+  const path = 'home'
+  const params = { id }
+  const herf = router.resolve({
+    name: path,
+    query: params,
+  });
+  return herf.href
+}
 </script>
 <template>
   <div class="w-full flex ph:overflow-x-auto justify-between scrollBar ph:pr-8" ref="el">
     <div :id="item.id" class="flex justify-start" v-for="item in showList" :ref="el => { divs[item.id] = el }">
-      <StrongTitle :name="item.name" :isCurrent="currentId === item.id" v-if="item.id !== DEFAULT_KEY"
-        @click="setCurrentId(item.id)">
+      <StrongTitle :href="renderLink(item.id)" :name="item.name" :isCurrent="currentId === item.id"
+        v-if="item.id !== DEFAULT_KEY" @click="setCurrentId(item.id)">
       </StrongTitle>
       <div v-else-if="hiddenList.length && isPc" class="w-fit cursor-pointer">
         <DropDownList :list="hiddenList" @itemClick="hiddenListClick">
-          <div class="font-trsFontFace text-2xl px-1 break-keep font-light">
-            {{ item.name }}</div>
+          <a :href="renderLink(item.id)" class="font-trsFontFace text-2xl px-1 break-keep font-light"
+            onclick="return false;">
+            {{ item.name }}</a>
         </DropDownList>
       </div>
     </div>

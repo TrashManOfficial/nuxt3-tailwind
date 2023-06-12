@@ -14,6 +14,7 @@ const channelStore = createStore({
       data: [],
     },
     currentChannelId: "",
+    currentChannelName: "",
     currentGroupId: "",
     currentDocId: "",
     articleList: {
@@ -32,21 +33,25 @@ const channelStore = createStore({
     articleListOver: false,
     carouselList: [],
     recommendList: [],
-    temp:[],
+    temp: [],
   },
   actions: {
-    async postReadCount({state},id) {
-      const data = await axiosReqres.post(`/fundapis/prise/api/read/${id}`,{},{baseURL: ''})
+    async postReadCount({ state }, id) {
+      const data = await axiosReqres.post(
+        `/fundapis/prise/api/read/${id}`,
+        {},
+        { baseURL: "" }
+      );
     },
     async getRecommendList({ state, commit }) {
       // const id = state.channelList.data.filter((i) => i.title === "首页")[0].id;
       // const { data } = await useApiFetch(
       //   `/channels/getChildId?channelId=${id}`
       // );
-      
+
       // const channelId = data._rawValue.data.find((i) => i.title === "热闻推荐").id;
       // console.log(channelId);
-      const list = await useApiFetch("/articles", {
+      const list = await axiosReqres("/articles", {
         params: {
           chnlId: 351,
           //区分不同web和客户端参数，固定
@@ -56,7 +61,7 @@ const channelStore = createStore({
         },
       });
       try {
-        commit("RECOMMEND", list.data._rawValue.data);
+        commit("RECOMMEND", list.data.data);
       } catch (err) {
         throw err;
       }
@@ -89,7 +94,7 @@ const channelStore = createStore({
       });
       try {
         commit("CLEAR_ARTICLES");
-        commit("ARTICLES", articles.data.data);
+        commit("ARTICLES", utils.mergeDuplicateItems(articles.data.data));
       } catch (err) {
         throw err;
       }
@@ -106,9 +111,13 @@ const channelStore = createStore({
           keyword: state.page.keyword,
         },
       });
+
+      //合并重复项
+      const mergedList = utils.mergeDuplicateItems(articles.data.data);
+
       try {
         // commit("CLEAR_ARTICLES");
-        commit("ARTICLES", articles);
+        commit("ARTICLES", mergedList);
       } catch (err) {
         throw err;
       }
@@ -163,7 +172,9 @@ const channelStore = createStore({
       }
     },
     async getArticleDetails({ commit }, id) {
-      const url = process.dev ? `/getArticle/${id}` : `https://www.xkb.com.cn/xkbapp/fundapi/article/api/getArticle/${id}`
+      const url = process.dev
+        ? `/getArticle/${id}`
+        : `https://www.xkb.com.cn/xkbapp/fundapi/article/api/getArticle/${id}`;
       const data = await axiosReqres(url, {});
       try {
         commit("ARTICLE_DETAILS", data);
@@ -172,7 +183,7 @@ const channelStore = createStore({
       }
     },
     async getCarousel({ commit }, id) {
-      const {data} = await useApiFetch("/articles/getRotationArticles", {
+      const { data } = await useApiFetch("/articles/getRotationArticles", {
         params: {
           chnlId: id,
         },
@@ -190,23 +201,38 @@ const channelStore = createStore({
         throw e;
       }
     },
-    async getChannel({ state, commit }, id = undefined) {
-      const  {data:allChannel} = await useApiFetch("/channels/getChildId", {
-        params: {
-          channelId: 348,
-          size: 100,
-        },
-      });
-      state.temp = [...allChannel._rawValue.data]
-    },
-    async getChannelAdd({ state, commit },id) {
-      const {data:addChannel} = await useApiFetch("/channels/getChildId", {
-        params: {
-          channelId: 382,
-          size: 100,
-        },
-      });
-      const finalData = [...state.temp, ...addChannel._rawValue.data]
+    // async getChannel({ state, commit }, id = undefined) {
+    //   const { data: allChannel } = await useApiFetch("/channels/getChildId", {
+    //     params: {
+    //       channelId: 348,
+    //       size: 100,
+    //     },
+    //   });
+    //   state.temp = [...allChannel._rawValue.data];
+    // },
+    async getChannelAdd({ state, commit }, id) {
+      const { data: addChannel } = await useFetch(
+        process.dev
+          ? "http://localhost:3000/fundapis/article/api/channels?page=0&size=100"
+          : "https://www.xkb.com.cn/fundapis/article/api/channels?page=0&size=100",
+        {
+          // server: true,
+          headers: {
+            siteId: 35,
+          },
+        }
+      );
+      const finalData = addChannel._rawValue.data
+        .map((item) => {
+          return {
+            id: item.id,
+            chnlName: item.chnlName,
+            defaultPosition: item.defaultPosition,
+            sortWeight: item.sortWeight,
+            title: item.title,
+          };
+        })
+        .sort((pre, next) => next.sortWeight - pre.sortWeight);
       try {
         commit("CHANNEL", { channel: finalData, id });
       } catch (err) {
@@ -217,6 +243,7 @@ const channelStore = createStore({
       state.page.keyword = "";
       try {
         commit("CURRENT_ID", id);
+        commit("CURRENT_NAME", id);
         commit("CLEAR_ARTICLES");
       } catch (err) {
         throw err;
@@ -234,7 +261,9 @@ const channelStore = createStore({
         },
       });
       try {
-        id ? commit("FEATURES", articles.data._rawValue.data) : commit("ARTICLES", articles.data._rawValue.data);
+        id
+          ? commit("FEATURES", articles.data._rawValue.data)
+          : commit("ARTICLES", articles.data._rawValue.data);
         // commit("ARTICLES", articles);
       } catch (err) {
         throw err;
@@ -317,13 +346,15 @@ const channelStore = createStore({
     CURRENT_ID: (state, id) => {
       state.currentChannelId = id;
     },
+    CURRENT_NAME: (state, id) => {
+      state.currentChannelName = state.channelList.data.find(
+        (item) => item.id === id
+      ).chnlName;
+    },
     ARTICLES: (state, articles) => {
       state.articleList.loading = false;
       state.articleListOver = articles.length < 10 ? true : false;
-      state.articleList.data = [
-        ...state.articleList.data,
-        ...articles,
-      ];
+      state.articleList.data = [...state.articleList.data, ...articles];
     },
     CLEAR_ARTICLES: (state) => {
       state.articleList.data = [];

@@ -25,8 +25,8 @@ const featuresList = ref([])
 //   getFeatures()
 // })
 const requestData = async () => {
-  const {data} = await useApiFetch('/articles?chnlId=430&visibility=1&page=0&size=10')
-  featuresList.value = data._rawValue.data
+  const {data} = await axiosReqres('/articles?chnlId=430&visibility=1&page=0&size=10',{server:false})
+  featuresList.value = data.data
 }
 requestData()
 
@@ -51,7 +51,7 @@ const linkRender = (data) => {
     <div class="bg-teal-50 rounded-xl p-3">
       <div class="mr-4 flex items-center mb-2 cursor-pointer" v-for="item in featuresList">
         <img src="~/assets/images/listicon.png" class="h-3 w-3" />
-        <a :href="linkRender(item)" @click="toDetail(item)" target="_blank">{{ item.title }}</a>
+        <a :href="linkRender(item)" @click.prevent="toDetail(item)" target="_blank">{{ item.title }}</a>
       </div>
   </div>
   <div class="full flex items-start ph:px-1 ph:py-3 flex-col text-sm mt-2 text-gray-400">

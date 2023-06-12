@@ -1,8 +1,33 @@
 <template>
   <Head>
-    <title>{{ '新快网_新中产的移动资讯友伴' }}</title>
-    <!-- <meta name="description" :content="ArticleDetail?.metaInfo?.shareDesc" />
-      <meta name="keywords" :content="ArticleDetail?.metaInfo?.keyWords" /> -->
+    <Title>{{ '新快网_新中产的移动资讯友伴' + `_${titleName}` }}</Title>
+    <Meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+    <Meta name="referrer" content="no-referrer" />
+    <Meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <Meta name="viewport" content="width=device-width,user-scalable=no" />
+    <Meta name="format-detection" content="telephone=no,email=no" />
+    <Meta name="apple-mobile-web-app-capable" content="yes" />
+    <Meta name="360-fullscreen" content="true" />
+    <!-- 针对手持设备优化，主要是针对一些老的不识别viewport的浏览器，比如黑莓 -->
+    <Meta name="HandheldFriendly" content="true" />
+    <!-- 微软的老式浏览器 -->
+    <Meta name="MobileOptimized" content="320" />
+    <!-- uc强制竖屏 -->
+    <Meta name="screen-orientation" content="portrait" />
+    <!-- QQ强制竖屏 -->
+    <Meta name="x5-orientation" content="portrait" />
+    <!-- UC强制全屏 -->
+    <Meta name="full-screen" content="yes" />
+    <!-- QQ强制全屏 -->
+    <Meta name="x5-fullscreen" content="true" />
+    <!-- UC应用模式 -->
+    <Meta name="browsermode" content="application" />
+    <!-- QQ应用模式 -->
+    <Meta name="x5-page-mode" content="app" />
+    <!-- windows phone 点击无高光 -->
+    <Meta name="msapplication-tap-highlight" content="no" />
+    <Meta name="apple-touch-fullscreen" content="YES" />
   </Head>
   <div v-for="item in [testData[0]]">
     <div>{{ item }}</div>
@@ -12,7 +37,7 @@
     <div class="w-[1500px] flex">
       <div class="w-3/4 flex items-center justify-between">
         <img class="m-2 h-12" src="~/assets/images/logo.png" alt="新快网logo" @click="toHome">
-        <CustomTabs ref="tabRef" class="justify-around" :isPc="isPc"></CustomTabs>
+        <CustomTabs ref="tabRef" class="justify-around" :isPc="isPc" key="top"></CustomTabs>
       </div>
       <div class="w-1/4 mx-2">
         <SearchBar @onSearch="onSearch">
@@ -39,13 +64,13 @@
         <div
           class="h-16 w-full ph:h-14 ph:px-2 flex justify-center ph:justify-between ph:items-center ph:bg-primary flex-col items-center ph:flex-row">
           <img class="hidden ph:flex ph:h-8" src="~/assets/images/logo_m.png" alt="" @click="toHome">
-          <SearchBar @onSearch="onSearch" class="w-1/2 ph:w-[250px]">
+          <SearchBar @onSearch="onSearch" class="w-1/2 ph:w-[200px]">
           </SearchBar>
           <div v-if="isPc" class="w-1/2">
-            <div class="mr-4 flex items-center cursor-pointer" v-for="item in channelStore.state.recommendList"
-              >
+            <div class="mr-4 flex items-center cursor-pointer" v-for="item in channelStore.state.recommendList">
               <img src="~/assets/images/listicon.png" class="h-3 w-3" />
-              <a class="text-white" :href="linkRender(item)" target="_blank" @click="toDetail(item)">{{ item.title }}</a>
+              <a class="text-white" :href="linkRender(item)" target="_blank" @click.prevent="toDetail(item)">{{ item.title
+              }}</a>
             </div>
           </div>
         </div>
@@ -53,28 +78,22 @@
     </div>
     <div class="w-[1100px] flex ph:w-full justify-center mt-5 ph:mt-3">
       <div class="w-9/12 ph:w-full ph:px-2 mr-6 ph:mr-0">
-        <CustomTabs ref="tabRef" class="mb-8 ph:mb-4 ph:pb-2 ph:border-b-[1px] ph:border-gray-300" :isPc="isPc">
+        <CustomTabs ref="tabRef" class="mb-8 ph:mb-4 ph:pb-2 ph:border-b-[1px] ph:border-gray-300" key="mid" :isPc="isPc">
         </CustomTabs>
         <div v-if="channelStore.state.currentChannelId === '350' && !isPc">
-          <div class="mr-4 flex items-center cursor-pointer" v-for="item in channelStore.state.recommendList"
-            >
+          <div class="mr-4 flex items-center cursor-pointer" v-for="item in channelStore.state.recommendList">
             <img src="~/assets/images/listicon.png" class="h-3 w-3" />
-            <a class="container" :href="linkRender(item)" target="_blank" @click="toDetail(item)"><span :class="`${item.title.length > 20 ? 'scroll-text' : ''}`">{{ item.title }}</span>
+            <a class="container" :href="linkRender(item)" target="_blank" @click.prevent="toDetail(item)"><span
+                :class="`${item.title.length > 20 ? 'scroll-text' : ''}`">{{ item.title }}</span>
             </a>
           </div>
         </div>
         <div class="w-full" v-if="Articlelist.length">
           <Carousel v-if="carouselList?.length" :list="carouselList" class="mb-3"></Carousel>
-          <a  v-for="item in Articlelist" :href="linkRender(item)" target="_blank" @click="toDetail(item)">
+          <a v-for="item in Articlelist" :href="linkRender(item)" target="_blank">
             <ListItem :data="item" :key="item">
             </ListItem>
           </a>
-          <!-- <a v-for="item in Articlelist" :href="toDetail(item)" :key="item" target="_blank">
-            <ListItem  :data="item" :key="item">
-          </ListItem>
-          </a> -->
-          <!-- <ListItem v-for="item in Articlelist" :data="item" :key="item" @click="toDetail(item)">
-          </ListItem> -->
         </div>
         <!-- <div v-else class="w-full h-[400px] flex justify-center items-center">
           暂无数据
@@ -111,6 +130,7 @@ const breakpoints = useBreakpoints(breakpointsTailwind)
 const isPc = ref(breakpoints.greater('md'))
 const bottomRef = ref()
 const tabRef = ref()
+const titleName = ref('首页')
 const targetIsVisible = useElementVisibility(bottomRef)
 const tabIsVisible = useElementVisibility(tabRef)
 
@@ -124,12 +144,33 @@ const toHome = () => {
   const href = router.resolve({
     path: '/home'
   })
-  window.open(href.href, '_blank')
+  // window.open(href.href, '_blank')
+  window.location.href = href.href
 }
 
 const linkRender = (data) => {
   return utils.renderLink(data, router, isPc)
 }
+
+const routerChange = (data) => {
+  const path = router.resolve(
+    {
+      path: data.state.current,
+      query: {
+        id: data.state.current.split('=')[1]
+      }
+    }
+  )
+  window.location.href = path.href
+}
+
+onMounted(() => {
+  window.addEventListener('popstate', routerChange, false)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('popstate', routerChange, false)
+})
 
 
 await channelStore.dispatch('clearArticleList')
@@ -153,9 +194,19 @@ const getArticleList = async () => {
 // await getChannels()
 
 // 正确操作√
-await channelStore.dispatch('getChannel', query.id)
-await channelStore.dispatch('getChannelAdd', query.id)
-await channelStore.dispatch('getRecommendList')
+// await channelStore.dispatch('getChannel', query.id)
+
+const getChannelName = async () => {
+  titleName.value = channelStore.state.channelList.data.find(
+    (item) => item.id === query.id
+  ).chnlName;
+  console.log( titleName.value);
+}
+
+
+await channelStore.dispatch('getChannelAdd', query.id || 350)
+await getChannelName()
+channelStore.dispatch('getRecommendList')
 await getArticleList()
 
 watch(() => channelStore.state.articleList.data, (value) => {
@@ -164,13 +215,8 @@ watch(() => channelStore.state.articleList.data, (value) => {
 
 //监听当前栏目是否为首页，请求轮播图
 const carouselList = ref([])
-watch(() => channelStore.state.currentChannelId, async (value) => {
-  if (value && channelStore.state.channelList.data.length) {
-    await getCarousel(value)
-  }
-})
 
-await channelStore.dispatch('getCarousel', 350)
+await channelStore.dispatch('getCarousel', query.id || 350)
 carouselList.value = [...channelStore.state.carouselList]
 
 const getCarousel = async (value) => {
@@ -183,6 +229,13 @@ const getCarousel = async (value) => {
   }
   carouselList.value = []
 }
+
+watch(() => channelStore.state.currentChannelId, async (value) => {
+  // currentChannelName.value = channelStore.state.channelList.data.find(item => item.id = channelStore.state.currentChannelId).chnlName
+  if (value && channelStore.state.channelList.data.length) {
+    await getCarousel(value)
+  }
+})
 
 //页面滚动底部请求更多数据
 watch(targetIsVisible, (value) => {

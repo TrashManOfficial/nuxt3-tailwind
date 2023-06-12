@@ -6,11 +6,11 @@ const props = defineProps({
 })
 </script>
 <template>
-  <div class="w-fit cursor-pointer ph:mr-1">
+  <a class="w-fit cursor-pointer ph:mr-1 inline-block" onclick="return false;">
     <div :class="`font-trsFontFace text-2xl ph:text-xl px-1 break-keep ${props.isCurrent ? 'font-extrabold' : 'font-light'}`">
       {{ props.name }}</div>
     <div :class="`w-fit ${props.isCurrent ? 'isActiveTab font-extrabold' : ''}`"></div>
-  </div>
+  </a>
 </template>
 <style scoped>
 .isActiveTab {

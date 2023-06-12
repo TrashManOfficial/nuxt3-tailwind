@@ -69,7 +69,7 @@ const tabRef = ref()
 const targetIsVisible = useElementVisibility(bottomRef)
 const tabIsVisible = useElementVisibility(tabRef)
 
-await channelStore.dispatch('getChannel')
+// await channelStore.dispatch('getChannel')
 await channelStore.dispatch('getChannelAdd')
 
 

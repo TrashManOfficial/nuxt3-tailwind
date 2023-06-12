@@ -23,19 +23,24 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
-    // routeRules: {
-    //   '/xkbapp': { proxy: 'https://app.xkb.com.cn' },
-    //   "/fundapis": { proxy: 'https://app.xkb.com.cn' },
-    // },
+    routeRules: {
+      // '/xkbapp': { proxy: 'https://app.xkb.com.cn' },
+      "/fundapis/article/api": { proxy: 'https://app.xkb.com.cn',cors: true, },
+    },
     devProxy: {
       "/xkbapp": {
         // 配置需要代理的路径 --> 这里的意思是代理http://localhost:80/api/后的所有路由
         target: "https://app.xkb.com.cn", // 目标地址 --> 服务器地址
         changeOrigin: true, // 允许跨域
       },
-      "/fundapis": {
+      "/fundapis/article/api": {
         // 配置需要代理的路径 --> 这里的意思是代理http://localhost:80/api/后的所有路由
-        target: "https://app.xkb.com.cn", // 目标地址 --> 服务器地址
+        target: "https://app.xkb.com.cn/fundapis/article/api", // 目标地址 --> 服务器地址
+        changeOrigin: true, // 允许跨域
+      },
+      "/trs_assets": {
+        // 配置需要代理的路径 --> 这里的意思是代理http://localhost:80/api/后的所有路由
+        target: "https://cdn.xkb.com.cn", // 目标地址 --> 服务器地址
         changeOrigin: true, // 允许跨域
       },
     },

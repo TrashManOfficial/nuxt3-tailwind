@@ -5,7 +5,10 @@ const getAssetsFile = (url) => {
 
 const replaceImgPath = (str) => {
   const reg = new RegExp("_600");
-  return str.replace(reg, "");
+  if (str) {
+    return str.replace(reg, "");  
+  }
+  return
 };
 
 const timeFormat = (dateStr) => {
@@ -58,10 +61,10 @@ const jump = (data, router, flag) => {
   let params = {};
   let path = "";
   if (metaInfo.docType === 8) {
-    window.open(metaInfo.linkDoc, "_blank");
+    // window.open(metaInfo.linkDoc, "_blank");
   }
   if (metaInfo.docType === 4) {
-    window.open(metaInfo.linkDoc, "_blank");
+    // window.open(metaInfo.linkDoc, "_blank");
   }
   if (metaInfo.docType === 3) {
     path = "special";
@@ -83,8 +86,10 @@ const jump = (data, router, flag) => {
     }
   } else {
     path = "detail";
+    const originalUrl = metaInfo.shareUrl
+    const originalId = originalUrl.split('?id=')[1]
     params = {
-      id: data.id || data.docId,
+      id: originalId || data.docId,
     };
     const herf = router.resolve({
       name: path,
@@ -134,8 +139,10 @@ const renderLink = (data, router, flag) => {
     // }
   } else {
     path = "detail";
+    const originalUrl = metaInfo.shareUrl
+    const originalId = originalUrl.split('?id=')[1]
     params = {
-      id: data.id || data.docId,
+      id: originalId || data.docId,
     };
     const herf = router.resolve({
       name: path,
@@ -172,11 +179,38 @@ function splitAndMergeArray(arr, len, index) {
   }
 }
 
+function mergeDuplicateItems(list) {
+  // 创建一个对象用于存储每个标题对应的合并项
+  const mergedItems = {};
+
+  // 遍历列表中的每一项
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i];
+    const title = item.listTitle;
+
+    // 如果标题在 mergedItems 中已存在，则将当前项合并到已存在的项中
+    if (mergedItems.hasOwnProperty(title)) {
+      mergedItems[title].count += item.count;
+      // 可根据实际需求进行其他属性的合并操作
+    } else {
+      // 如果标题不存在于 mergedItems 中，则将当前项作为新的合并项
+      mergedItems[title] = { ...item };
+    }
+  }
+
+  // 将合并后的项从 mergedItems 对象中提取为一个新的数组
+  const mergedList = Object.values(mergedItems);
+
+  return mergedList;
+}
+
+
 export default {
   getAssetsFile,
   timeFormat,
   jump,
   replaceImgPath,
   splitAndMergeArray,
-  renderLink
+  renderLink,
+  mergeDuplicateItems
 };

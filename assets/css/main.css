@@ -5,6 +5,6 @@
 @layer base {
   @font-face {
     font-family: "trsFontFace";
-    src: url("/trs_assets/FZLTXIHJW.woff2") format('woff2'),url("/trs_assets/FZLTXIHJW.woff") format('woff'),url("/trs_assets/FZLTXIHJW.ttf") format('truetype');
+    src: url("https://cdn.xkb.com.cn/trs_assets/font-family/FZLTXIHJW.woff2") format('woff2'),url("https://cdn.xkb.com.cn/trs_assets/font-family/FZLTXIHJW.woff") format('woff'),url("https://cdn.xkb.com.cn/trs_assets/font-family/FZLTXIHJW.ttf") format('truetype');
   }
 }

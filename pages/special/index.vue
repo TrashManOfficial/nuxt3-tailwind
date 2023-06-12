@@ -1,4 +1,7 @@
 <template>
+  <Head>
+    <Title>{{ '新快网_新中产的移动资讯友伴' }}</Title>
+  </Head>
   <div
     :class="`w-full flex bg-white h-20 items-center shadow-md z-50 justify-center ${tabIsVisible ? '' : 'fixed top-0'}`"
     v-if="isPc">
@@ -85,8 +88,8 @@ const getSpecialDetail = () => {
   })
 }
 
-const getChannels = async() => {
-  await channelStore.dispatch('getChannel')
+const getChannels = async () => {
+  // await channelStore.dispatch('getChannel')
   await channelStore.dispatch('getChannelAdd')
   getSpecialDetail()
 }
@@ -115,9 +118,10 @@ const toDetail = (data) => {
 
 const toHome = () => {
   const href = router.resolve({
-    path:'/home'
+    path: '/home'
   })
-  window.open(href.href,'_blank')
+  // window.open(href.href, '_blank')
+  window.location.href = href.href
 }
 </script>
 <style scoped>
