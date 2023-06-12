@@ -200,7 +200,6 @@ const getChannelName = async () => {
   titleName.value = channelStore.state.channelList.data.find(
     (item) => item.id === query.id
   ).chnlName;
-  console.log( titleName.value);
 }
 
 
@@ -231,6 +230,9 @@ const getCarousel = async (value) => {
 }
 
 watch(() => channelStore.state.currentChannelId, async (value) => {
+  titleName.value = channelStore.state.channelList.data.find(
+    (item) => item.id === value
+  ).chnlName
   // currentChannelName.value = channelStore.state.channelList.data.find(item => item.id = channelStore.state.currentChannelId).chnlName
   if (value && channelStore.state.channelList.data.length) {
     await getCarousel(value)

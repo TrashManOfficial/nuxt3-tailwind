@@ -15,7 +15,7 @@ const DEFAULT_LIST_LENGTH = 7
 
 const props = defineProps({
   isPc: Boolean,
-  defautId: Number,
+  defautId: String,
 })
 const tabList = ref([])
 
@@ -41,7 +41,10 @@ props.defautId && channelStore.dispatch('setCurrentId', currentId.value)
 // 移动端浏览器自动滚动到对应栏目位置
 if (!props.isPc) {
   nextTick(() => {
-    divs.value[currentId.value].scrollIntoView({ inline: "start" })
+    try {
+      divs.value[currentId.value].scrollIntoView({ inline: "start" })
+    } catch (error) {
+    }
   })
 }
 
@@ -114,7 +117,7 @@ const hiddenList = computed(() => {
 
 const defineData = hiddenList.value.find(item => item.id === props.defautId)
 if (defineData) {
-  channelStore.dispatch('exchangeItem', { index: DEFAULT_LENGTH.value, data:defineData })
+  channelStore.dispatch('exchangeItem', { index: DEFAULT_LENGTH.value, data: defineData })
 }
 
 const hiddenListClick = (data) => {
