@@ -31,6 +31,6 @@ const formatTitle = (str) => {
       </InfoBar>
     </div>
     <img v-lazy="props.data.metaInfo.thumbnails[0]" v-if="props.data.metaInfo.listStyle !== 2"
-      class="h-full ph:w-28 w-44 rounded-lg object-cover" />
+      class="h-full ph:w-28 w-44 rounded-lg object-cover" referrerpolicy="no-referrer"/>
   </div>
 </template>

@@ -1,8 +1,6 @@
-<template>
-  <div></div>
-</template>
 <script setup>
-var _hmt = _hmt || [];
+useHead({
+  script: [{ children: `var _hmt = _hmt || [];
 (function () {
   var hm = document.createElement("script");
   hm.src = "https://hm.baidu.com/hm.js?1924177ad2e7e7298da96b4846fdf1d4";
@@ -37,5 +35,6 @@ var _hmt = _hmt || [];
   s.defer = !0;
   s.async = !0;
   g.parentNode.insertBefore(s, g);
-})(window, document, "script", "_qha", 511832, false);
+})(window, document, "script", "_qha", 511832, false);` }],
+});
 </script>

@@ -8,12 +8,18 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  plugins:[
+    // {
+    //   src: '@/plugins/record.js',
+    //   mode: 'client'
+    // }
+  ],
   app: {
     baseURL:process.env.BASE_PATH,
   },
   routeRules: {
     '/':  {
-      redirect:`${process.env.BASE_PATH}/home`
+      redirect:`${process.env.BASE_PATH}${process.env.HOME_PATH}`
     }
   },
   modules: ["nuxt3-vuex-module", "@vueuse/nuxt"],

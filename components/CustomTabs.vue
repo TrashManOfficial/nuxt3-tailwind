@@ -6,7 +6,7 @@ import channelStore from '../store/channel';
 import { useRouter, useRoute } from 'vue-router'
 import { XMarkIcon, Bars3BottomRightIcon } from '@heroicons/vue/24/solid'
 const router = useRouter()
-const { query } = useRoute()
+const { query,params } = useRoute()
 
 const { state } = channelStore
 
@@ -93,6 +93,9 @@ watch(() => state.currentChannelId, (value) => {
 })
 
 const setCurrentId = (id) => {
+  if(id === currentId.value) {
+    return
+  }
   switchShowModal('close')
   channelStore.dispatch('setCurrentId', id).then(() => {
     window.scrollTo(0, 0)
@@ -101,7 +104,7 @@ const setCurrentId = (id) => {
     }
     channelStore.dispatch('getArticleList')
   })
-  router.push({ path: '/home', query: { id: id } })
+  router.push({ path: '/list/' + id, })
 }
 
 const showList = computed(() => {
@@ -145,13 +148,14 @@ const switchShowModal = (close) => {
   }
 }
 const renderLink = (id) => {
-  const path = 'home'
-  const params = { id }
-  const herf = router.resolve({
-    name: path,
-    query: params,
-  });
-  return herf.href
+  // const path = 'home'
+  // const params = { id }
+  // const herf = router.resolve({
+  //   name: path + `/${id}`,
+  //   // query: params,
+  // });
+  // return herf.href
+  return `/list/${id}`
 }
 </script>
 <template>

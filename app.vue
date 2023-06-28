@@ -1,9 +1,9 @@
 <template>
-  <ClientOnly>
+  <!-- <ClientOnly>
     <Record></Record>
-  </ClientOnly>
+  </ClientOnly> -->
   <NuxtPage />
 </template>
 <script setup>
-import Record from './components/Record.vue';
+// import Record from './components/Record.vue';
 </script>

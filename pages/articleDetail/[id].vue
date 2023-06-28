@@ -1,8 +1,8 @@
 <template>
   <Head>
-    <Title>{{ ArticleDetail.title }}</Title>
-    <Meta name="referrer" content="no-referrer"></Meta>
-    <Meta name="description" :content=" ArticleDetail.title + ArticleDetail?.metaInfo?.shareDesc" />
+    <Title>{{ ArticleDetail.title + '__新快网' }}</Title>
+    <!-- <Meta name="referrer" content="no-referrer"></Meta> -->
+    <!-- <Meta name="description" :content=" ArticleDetail.title + ArticleDetail?.metaInfo?.shareDesc" /> -->
     <Meta name="keywords" :content="ArticleDetail?.metaInfo?.keyWords + `新闻,要闻,广东,广州,新快报,股评,房产,大事件,报纸,评论,深读,专题,星座 新闻,要闻,广东,广州,新快报,股评,房产,大事件,报纸,评论,深读,专题,星座`" />
   </Head>
   <div
@@ -24,7 +24,7 @@
       <div class="max-w-[750px] pr-6 flex flex-col ph:w-full">
         <div>
           <div class="text-3xl font-black my-6" ref="tabRef">{{ ArticleDetail.title }}</div>
-          <InfoBar class="mb-3" :data="{ source: ArticleDetail?.metaInfo?.source, time: ArticleDetail.docPubTime }">
+          <InfoBar class="mb-3" :data="{ source: ArticleDetail?.metaInfo?.source, time: ArticleDetail.docPubTime,isSSR:true }">
           </InfoBar>
         </div>
         <!-- 一般文章稿件 -->
@@ -111,7 +111,7 @@ import { parse } from 'node-html-parser';
 
 const tabRef = ref()
 const tabIsVisible = useElementVisibility(tabRef)
-const { query } = useRoute()
+const { query,params } = useRoute()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const isPc = ref(breakpoints.greater('md'))
 const ArticleDetail = ref({})
@@ -135,9 +135,11 @@ const contentRef = ref()
 
 const commentList = ref([])
 
+
+
 const onSearch = (text) => {
   const herf = router.resolve({
-    path: 'search',
+    path: '/search',
     query: {
       keyword: text
     }
@@ -151,7 +153,7 @@ onBeforeMount(() => {
 
 const redirectToMobile = () => {
   if (!isPc.value) {
-    window.location.href = `https://www.xkb.com.cn/fundhtml/#/details?id=${query.id}`;
+    window.location.href = `https://www.xkb.com.cn/fundhtml/#/details?id=${params.id}`;
   }
 }
 
@@ -176,6 +178,7 @@ const handleVideoInHtml = (html) => {
     video.firstChild.setAttribute('style', img.getAttribute('style'));
     video.firstChild.setAttribute('class', 'm-auto');
     video.firstChild.setAttribute('controls', true);
+    video.firstChild.setAttribute('referrerpolicy', 'no-referrer');
     // console.log(video.toString());
 
     // 将img标签替换为video标签
@@ -197,16 +200,17 @@ const toDetail = (data) => {
     metaInfo: {
       listStyle: data.listStyle,
       shareUrl:data.shareUrl,
+      docType:data.docType,
     }
   }
-  utils.jump(temp, router, isPc)
+  window.open(utils.renderLink(temp, router, isPc))
 }
 // await channelStore.dispatch('getChannel')
 await channelStore.dispatch('getChannelAdd')
 
 
 const getCommentList = () => {
-  channelStore.dispatch('getCommentList', query.id).then(() => {
+  channelStore.dispatch('getCommentList', params.id).then(() => {
     commentList.value = channelStore.state.commentList
   })
 }
@@ -267,12 +271,12 @@ const handleArticle = async (data) => {
 
 
 const readCount = () => {
-  const id = query.id
+  const id = params.id
   channelStore.dispatch('postReadCount',id)
 }
 
 const getArticleDetail = async () => {
-  await channelStore.dispatch('getArticleDetails', query.id)
+  await channelStore.dispatch('getArticleDetails', params.id)
   await handleArticle(channelStore.state.articleDetail)
   !process.dev && readCount()
   // channelStore.dispatch('getCommentList', query.id).then(() => {
@@ -284,7 +288,7 @@ await getArticleDetail()
 
 const toHome = () => {
   const href = router.resolve({
-    path: '/home'
+    path: '/list/350'
   })
   // window.open(href.href, '_blank')
   window.location.href = href.href

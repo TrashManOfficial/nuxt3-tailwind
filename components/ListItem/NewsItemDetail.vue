@@ -17,6 +17,6 @@ const props = defineProps({
       </InfoBar>
     </div>
     <img v-if="props.data.listStyle !== 2" :src="props.data.thumbnails[0]"
-      class="h-full w-44 rounded-lg object-cover" />
+      class="h-full w-44 rounded-lg object-cover" referrerpolicy="no-referrer"/>
   </div>
 </template>

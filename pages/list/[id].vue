@@ -3,7 +3,7 @@
     <Title>{{ '新快网_新中产的移动资讯友伴' + `_${titleName}` }}</Title>
     <Meta name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
-    <Meta name="referrer" content="no-referrer" />
+    <!-- <Meta name="referrer" content="no-referrer" /> -->
     <Meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <Meta name="viewport" content="width=device-width,user-scalable=no" />
     <Meta name="format-detection" content="telephone=no,email=no" />
@@ -69,7 +69,7 @@
           <div v-if="isPc" class="w-1/2">
             <div class="mr-4 flex items-center cursor-pointer" v-for="item in channelStore.state.recommendList">
               <img src="~/assets/images/listicon.png" class="h-3 w-3" />
-              <a class="text-white" :href="linkRender(item)" target="_blank" @click.prevent="toDetail(item)">{{ item.title
+              <a class="text-white" :href="linkRender(item)" target="_blank">{{ item.title
               }}</a>
             </div>
           </div>
@@ -83,7 +83,7 @@
         <div v-if="channelStore.state.currentChannelId === '350' && !isPc">
           <div class="mr-4 flex items-center cursor-pointer" v-for="item in channelStore.state.recommendList">
             <img src="~/assets/images/listicon.png" class="h-3 w-3" />
-            <a class="container" :href="linkRender(item)" target="_blank" @click.prevent="toDetail(item)"><span
+            <a class="container" :href="linkRender(item)" target="_blank"><span
                 :class="`${item.title.length > 20 ? 'scroll-text' : ''}`">{{ item.title }}</span>
             </a>
           </div>
@@ -138,11 +138,11 @@ const Articlelist = ref([])
 
 const testData = ref([])
 
-const { query } = useRoute()
+const { query,params } = useRoute()
 
 const toHome = () => {
   const href = router.resolve({
-    path: '/home'
+    path: '/list/350'
   })
   // window.open(href.href, '_blank')
   window.location.href = href.href
@@ -152,25 +152,25 @@ const linkRender = (data) => {
   return utils.renderLink(data, router, isPc)
 }
 
-const routerChange = (data) => {
-  const path = router.resolve(
-    {
-      path: data.state.current,
-      query: {
-        id: data.state.current.split('=')[1]
-      }
-    }
-  )
-  window.location.href = path.href
-}
+// const routerChange = (data) => {
+//   const path = router.resolve(
+//     {
+//       path: data.state.current,
+//       query: {
+//         id: data.state.current.split('=')[1]
+//       }
+//     }
+//   )
+//   window.location.href = path.href
+// }
 
-onMounted(() => {
-  window.addEventListener('popstate', routerChange, false)
-})
+// onMounted(() => {
+//   window.addEventListener('popstate', routerChange, false)
+// })
 
-onUnmounted(() => {
-  window.removeEventListener('popstate', routerChange, false)
-})
+// onUnmounted(() => {
+//   window.removeEventListener('popstate', routerChange, false)
+// })
 
 
 await channelStore.dispatch('clearArticleList')
@@ -198,12 +198,12 @@ const getArticleList = async () => {
 
 const getChannelName = async () => {
   titleName.value = channelStore.state.channelList.data.find(
-    (item) => item.id === query.id
+    (item) => item.id === params.id
   ).chnlName;
 }
 
 
-await channelStore.dispatch('getChannelAdd', query.id || 350)
+await channelStore.dispatch('getChannelAdd', params.id || 350)
 await getChannelName()
 channelStore.dispatch('getRecommendList')
 await getArticleList()
@@ -215,7 +215,7 @@ watch(() => channelStore.state.articleList.data, (value) => {
 //监听当前栏目是否为首页，请求轮播图
 const carouselList = ref([])
 
-await channelStore.dispatch('getCarousel', query.id || 350)
+await channelStore.dispatch('getCarousel', params.id || 350)
 carouselList.value = [...channelStore.state.carouselList]
 
 const getCarousel = async (value) => {
@@ -255,7 +255,7 @@ const toDetail = (data) => {
 
 const onSearch = (text) => {
   const herf = router.resolve({
-    path: 'search',
+    path: '/search',
     query: {
       keyword: text
     }

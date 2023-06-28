@@ -213,8 +213,8 @@ const channelStore = createStore({
     async getChannelAdd({ state, commit }, id) {
       const { data: addChannel } = await useFetch(
         process.dev
-          ? "http://localhost:3000/fundapis/article/api/channels?page=0&size=100"
-          : "https://www.xkb.com.cn/fundapis/article/api/channels?page=0&size=100",
+          ? "http://localhost:3000/fundapis/article/api/webChannels?page=0&size=100"
+          : "https://www.xkb.com.cn/fundapis/article/api/webChannels?page=0&size=100",
         {
           // server: true,
           headers: {

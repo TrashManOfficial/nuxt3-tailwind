@@ -8,7 +8,8 @@ const breakpoints = useBreakpoints(breakpointsTailwind)
 const isPc = ref(breakpoints.greater('md'))
 const router = useRouter()
 const toDetail = (data) => {
-  utils.jump(data, router, isPc)
+  // utils.jump(data, router, isPc)
+  window.open(utils.renderLink(data, router, isPc))
 }
 const carouselRef = ref()
 let isCarouselHover = useElementHover(carouselRef)
@@ -65,15 +66,15 @@ const reg = new RegExp('_600')
           :class="`duration-700 ease-in-out ${currentVisibleImg === index ? '' : 'hidden'}`">
           <span
             class="absolute top-1/2 left-1/2 text-2xl font-semibold text-white -translate-x-1/2 -translate-y-1/2 sm:text-3xl dark:text-gray-800"></span>
-          <img :src="utils.replaceImgPath(item.metaInfo.focusPic)" @click="toDetail(item)"
+          <img :src="utils.replaceImgPath(item.metaInfo.focusPic || item.metaInfo.thumbnails?.[0])" referrerpolicy="no-referrer" @click="toDetail(item)"
             class="min-h-[460px] ph:min-h-[255px] block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 object-cover" alt="">
           <div
-            class="whitespace-normal text-center ph:text-sm flex p-1 absolute bottom-0 left-1/2 z-30 space-x-3 -translate-x-1/2 bg-black w-full min-h-11 max-h-10 opacityLinear text-2xl text-white justify-center items-center rounded-b-lg">
+            class="whitespace-normal text-center ph:text-sm flex p-1 absolute bottom-0 left-1/2 z-30 space-x-3 -translate-x-1/2 bg-black w-full h-12 opacityLinear text-xl text-white justify-center items-center rounded-b-lg">
             {{ item.title }}</div>
         </div>
       </div>
       <!-- Slider indicators -->
-      <div class="flex absolute bottom-10 left-1/2 z-30 space-x-3 -translate-x-1/2">
+      <div class="flex absolute bottom-12 left-1/2 z-30 space-x-3 -translate-x-1/2">
         <button v-for="(item, index) in props.list" type="button"
           :class="`w-3 h-3 rounded-full ${index === currentVisibleImg ? 'bg-white' : 'bg-slate-600'}`"
           @click="selectImg(index)"></button>

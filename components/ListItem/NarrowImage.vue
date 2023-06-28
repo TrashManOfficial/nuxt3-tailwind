@@ -10,6 +10,6 @@ const props = defineProps({
 </script>
 <template>
   <div class="w-full">
-    <img v-lazy="utils.replaceImgPath(props.data.metaInfo.thumbnails[0])" class="w-full rounded-xl"/>
+    <img v-lazy="utils.replaceImgPath(props.data.metaInfo.thumbnails[0])" class="w-full rounded-xl" referrerpolicy="no-referrer"/>
   </div>
 </template>

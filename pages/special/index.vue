@@ -48,7 +48,7 @@ import Footer from '../../components/Footer.vue';
 import ScrollToTop from '../../components/ScrollToTop.vue';
 import CustomTabs from '../../components/CustomTabs.vue';
 import CustomTabsSpecial from '../../components/CustomTabsSpecial.vue';
-import util from '../../utils'
+import utils from '../../utils'
 import SideBar from '../../components/SideBar.vue';
 import { breakpointsTailwind, useBreakpoints, useElementVisibility } from '@vueuse/core'
 import channelStore from '../../store/channel';
@@ -81,7 +81,7 @@ const redirectToMobile = () => {
 const getSpecialDetail = () => {
   channelStore.dispatch('getArticleDetails', query.docid).then(() => {
     ArticleDetail.value = channelStore.state.articleDetail
-    imgUrl.value = util.replaceImgPath(channelStore.state.articleDetail.metaInfo.thumbnails[0])
+    imgUrl.value = utils.replaceImgPath(channelStore.state.articleDetail.metaInfo.thumbnails[0])
     channelStore.dispatch('setCurrentDocId', query.docid).then(() => {
       startRenderList.value = true
     })
@@ -113,14 +113,13 @@ watch(() => channelStore.state.articleList.data, (value) => {
 // })
 
 const toDetail = (data) => {
-  util.jump(data, router, isPc)
+  window.open(utils.renderLink(data, router, isPc))
 }
 
 const toHome = () => {
   const href = router.resolve({
-    path: '/home'
+    path: '/list/350'
   })
-  // window.open(href.href, '_blank')
   window.location.href = href.href
 }
 </script>

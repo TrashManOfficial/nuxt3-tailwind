@@ -13,7 +13,7 @@
         instances: "2", // max表示最大的 应用启动实例个数，仅在 cluster 模式有效 默认为 fork
         autorestart: true, // 默认为 true, 发生异常的情况下自动重启
         max_memory_restart: "1G",
-        // error_file: './logs/app-err.log', // 错误日志文件
+        error_file: '/data/TRS/webroot/nuxt3-app/logs/app-err.log', // 错误日志文件
         // out_file: './logs/app-out.log', // 正常日志文件
         merge_logs: true, // 设置追加日志而不是新建日志
         log_date_format: "YYYY-MM-DD HH:mm:ss", // 指定日志文件的时间格式

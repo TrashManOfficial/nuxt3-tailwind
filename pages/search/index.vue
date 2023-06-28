@@ -111,7 +111,8 @@ watch(targetIsVisible, (value) => {
 
 const router = useRouter()
 const toDetail = (data) => {
-  utils.jump(data, router, isPc)
+  window.open(utils.renderLink(data, router, isPc))
+  // utils.jump(data, router, isPc)
 }
 
 const onSearch = (text) => {
@@ -129,7 +130,7 @@ const onSearch = (text) => {
 
 const toHome = () => {
   const href = router.resolve({
-    path: '/home'
+    path: '/list/350'
   })
   // window.open(href.href, '_blank')
   window.location.href = href.href

@@ -13,6 +13,6 @@ const props = defineProps({
       <img src="../~/assets/images/comment.png" class="h-4 w-5" />
       <div>评论：<span class="text-primary">{{ data.comment }}</span></div>
     </div> -->
-    <div class="mr-4">{{ util.timeFormat(data.time) }}</div>
+    <div class="mr-4">{{ util.timeFormat(data.time,data.isSSR) }}</div>
   </div>
 </template>

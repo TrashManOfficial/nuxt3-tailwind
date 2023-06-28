@@ -22,8 +22,8 @@
         restart_delay: 60, // 异常重启情况下，延时重启时间
         env: {
           // 环境参数，当前指定为开发环境
-          NODE_ENV: "development",
-          PORT: "3000",
+          NODE_ENV: "test",
+          PORT: "3001",
         },
         env_production: {
           // 环境参数,当前指定为生产环境

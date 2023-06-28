@@ -11,18 +11,23 @@ const replaceImgPath = (str) => {
   return
 };
 
-const timeFormat = (dateStr) => {
+const timeFormat = (dateStr,isSSR) => {
   if (!dateStr) {
     return "";
   }
-  const date = new Date(timeStringHandler(dateStr));
+  // const date = new Date(timeStringHandler(dateStr));
+  const date = isSSR ? new Date(dateStr): new Date(timeStringHandler(dateStr));
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
-  // const hour = date.getHours();
-  // const minute = date.getMinutes();
+  const hour = date.getHours();
+  const minute = date.getMinutes();
   // const second = date.getSeconds();
 
+  if(isSSR) {
+    const dateString = `${year}-${month}-${day} ${hour}:${minute}`;
+    return dateString
+  }
   // 使用正则表达式检查日期格式是否为'yyyy-MM-dd'
   const dateString = `${year}-${month}-${day}`;
   const regEx = /^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])$/;
@@ -85,18 +90,18 @@ const jump = (data, router, flag) => {
       window.location.href = `https://www.xkb.com.cn/fundhtml/#/specialdoc?id=${data.id}`;
     }
   } else {
-    path = "detail";
+    path = "articleDetail";
     const originalUrl = metaInfo.shareUrl
     const originalId = originalUrl.split('?id=')[1]
     params = {
       id: originalId || data.docId,
     };
     const herf = router.resolve({
-      name: path,
+      path: `/${path}/${params.id}`,
       query: params,
     });
     if (flag.value) {
-      window.open(herf.href, "_blank");
+      window.open(herf.herf, "_blank");
       // console.log(herf.href);
       // return herf.href
     } else {
@@ -138,16 +143,16 @@ const renderLink = (data, router, flag) => {
     //   // window.location.href = `https://www.xkb.com.cn/fundhtml/#/specialdoc?id=${data.id}`;
     // }
   } else {
-    path = "detail";
+    path = "articleDetail";
     const originalUrl = metaInfo.shareUrl
     const originalId = originalUrl.split('?id=')[1]
     params = {
       id: originalId || data.docId,
     };
     const herf = router.resolve({
-      name: path,
-      query: params,
+      path: `/${path}/${params.id}`,
     });
+    // return `/${path}/${params.id}`
     return herf.href
     // if (flag.value) {
     //   // window.open(herf.href, "_blank");
